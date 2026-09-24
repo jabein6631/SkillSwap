@@ -1,0 +1,170 @@
+# 🎓 SkillSwap — Peer-to-Peer Skill Exchange Platform
+
+> **Engineered for Vignan University** by **Sri Dhanush** (B.Tech CSE, 3rd Year).
+> A cashless, time-banking peer skill-swap platform featuring **AI Dynamic 20-Question Qualification Assessments**, **Competitive Negative Marking (+3 / -1 / 0)**, **Verified Certificate Integration (NPTEL / Other Recognized Platform)**, **Review-Driven Ratings**, and **Smart Escrow Credit Contracts**.
+
+---
+
+## 📁 Project Architecture
+
+```
+skillswap/
+│
+├── frontend/
+│   ├── index.html               # Main Single Page Application interface
+│   ├── css/
+│   │   └── style.css            # Responsive styles, design tokens & theme
+│   └── js/
+│       ├── app.js               # UI controller, matrix navigator, exam modals
+│       ├── data.js              # Mock personas, catalog & seed state
+│       ├── wallet.js            # Client-side state store & API connector
+│       └── database/
+│           └── trusodb.js       # Client-side TrusoDB engine integration
+│
+├── backend/
+│   ├── server.js                # Express app entrypoint & static server
+│   ├── routes/                  # REST API routes (auth, booking, sessions, etc.)
+│   ├── controllers/             # Resource controllers
+│   ├── middleware/              # Authentication & logging middleware
+│   ├── services/                # Gemini AI & Certificate verification services
+│   └── database/
+│       ├── db.js                # Asynchronous database client
+│       ├── trusodb.js           # TrusoDB relational data engine provider
+│       ├── trusodb_schema.sql   # Production relational schema DDL
+│       └── seed.js              # Database seed script for Vignan personas
+│
+├── tests/
+│   ├── e2e/                     # End-to-End browser test automation
+│   ├── frontend/                # Client-side DOM & binding tests
+│   ├── integration/             # Backend API & service integration tests
+│   └── scripts/                 # Test helper data maintenance scripts
+│
+├── scratch/                     # Diagnostic & scratch scripts
+├── uploads/                     # File attachments & certificate storage
+├── .env                         # Environment variables configuration
+├── .gitignore                   # Git ignore specifications
+├── package.json                 # Node.js project manifest & scripts
+├── README.md                    # Platform documentation
+└── Dockerfile                   # Production containerization build
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Seed Database
+```bash
+npm run seed
+```
+
+### 3. Start Server
+```bash
+npm start
+```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+---
+
+## 🎯 4-Tier Tutor Classification System
+
+Students earn teaching badges and command higher hourly credit rates based on their qualification and verified credentials:
+
+| Category Tier | Academic & Quiz Requirements | Hourly Credit Rate |
+| :--- | :--- | :--- |
+| 🥉 **1. Bronze Tutor** | Passed Quiz (42–53 Marks / 70%–89%) + No Certificate | **1.0 Cr / hr** |
+| 🥈 **2. Silver Tutor** | High Distinction (≥54 Marks / ≥90%) + No Certificate | **1.5 Cr / hr** |
+| 🎖️ **3. Advanced Tutor** | Passed Quiz (42–53 Marks / 70%–89%) + Verified NPTEL or Other Cert | **2.0 Cr / hr** |
+| 🥇 **4. Elite Master Tutor**| High Distinction (≥54 Marks / ≥90%) + Verified NPTEL or Other Cert | **2.5 Cr / hr** |
+
+> ⭐ **Star Ratings (1.0 to 5.0)** are calculated solely from verified student reviews and feedback tags after completed sessions.
+
+---
+
+## 🧠 AI Dynamic 20-Question Assessment & Negative Marking
+
+### 📐 Marking Scheme
+- **Correct Answer**: `+3 Marks`
+- **Wrong Answer**: `-1 Mark`
+- **Unattempted Question**: `0 Marks`
+- **Maximum Possible Marks**: `20 × 3 = 60 Marks`
+- **Percentage Formula**:
+  $$\text{Score \%} = \max\left(0, \text{Math.round}\left(\frac{\text{Marks Obtained}}{60} \times 100\right)\right)$$
+
+### ✨ Features
+1. **Dynamic Generation**: Powered by Google Gemini (`gemini-2.5-flash`) with randomized domain synthesizers for Python/OOP, React, UI/UX & Figma, SQL, and Machine Learning.
+2. **20-Question Jump Matrix**: Real-time 1-to-20 navigation grid with `answered`, `active`, and `unattempted` states.
+3. **Choice Eraser**: "Clear Choice" button enables leaving questions unattempted (0 marks) to prevent negative mark deductions.
+4. **Full Response Auditing**: Every attempt records user choices, correct keys, explanations, and mark impacts in `quiz_attempts`.
+
+---
+
+## 🛡️ Smart Credit Escrow Engine
+
+1. **Booking**: When a learner books a session (e.g. 2 hours with an Elite Master @ 2.5 Cr/hr = 5.0 Credits), the credits are **locked in escrow**.
+2. **Conducted**: Mentor and learner conduct the peer session via Google Meet / Zoom.
+3. **Completion & Review**: Learner marks session complete and submits a star rating + review.
+4. **Payout**: Escrow releases the 5.0 credits directly to the tutor's wallet.
+
+---
+
+## 🐳 Docker Containerization
+
+To run SkillSwap inside a Docker container:
+
+```bash
+# Build image
+docker build -t skillswap:latest .
+
+# Run container
+docker run -d -p 3000:3000 --name skillswap-app skillswap:latest
+```
+
+---
+
+## 📜 License
+Developed for **Vignan University** student community under the **ISC License**.
+
+
+🛠️ Technology Stack
+Frontend
+Technology	Purpose
+React.js	Building the interactive user interface
+JavaScript	Application logic and client-side functionality
+HTML5	Web page structure
+CSS3	Styling and responsive design
+Backend
+Technology	Purpose
+Node.js	Server-side JavaScript runtime
+Express.js	REST API and backend framework
+REST API	Communication between frontend and backend
+Database & Cloud
+Technology	Purpose
+TrusoDB	Production relational database & data engine
+TrusoDB Auth Bridge	User authentication & session management
+TrusoDB Storage	Certificate and document storage
+Certificate Verification
+Technology/Technique	Purpose
+OCR	Extract text from certificates
+Image Processing	Analyze certificate images
+Logo Verification	Compare certificate logos with trusted references
+QR Verification	Validate QR codes when available
+Certificate ID Validation	Check certificate identifiers
+Verification Engine	Combine multiple checks to determine authenticity
+Real-Time Communication
+Technology	Purpose
+LiveKit	Real-time audio/video communication
+WebRTC	Low-latency media communication
+LiveKit Tokens	Secure room access
+Development & Deployment
+Technology	Purpose
+Git	Version control
+GitHub	Repository hosting and collaboration
+Docker	Containerization
+VS Code	Development environment
+Postman	API testing
+

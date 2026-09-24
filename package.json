@@ -1,0 +1,46 @@
+{
+  "name": "skill-swap-platform",
+  "version": "1.0.0",
+  "description": "SkillSwap: Cashless Peer-to-Peer Skill Exchange with AI Dynamic 20-Q Assessment, Negative Marking (+3/-1/0), and 4-Tier Tutor Classification for Vignan University",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "seed": "node backend/database/seed.js",
+    "clean": "node backend/database/clean_db.js",
+    "sync:trusodb": "node backend/database/sync_trusodb.js",
+    "test": "node tests/e2e/test_booking_flow_e2e.js",
+    "test:e2e": "node tests/e2e/test_booking_flow_e2e.js",
+    "test:integration": "node tests/integration/test_user_visibility_isolation.js",
+    "test:cert": "node tests/integration/test_cert_lifecycle.js",
+    "test:cert:e2e": "node tests/e2e/test_browser_cert_flow_e2e.js",
+    "test:assessment": "node tests/integration/test_dynamic_assessment.js",
+    "test:session-end": "node tests/integration/test_automatic_session_end.js",
+    "test:benchmark": "node tests/scripts/test_speed_benchmark.js",
+    "test:all": "node tests/e2e/test_booking_flow_e2e.js && node tests/integration/test_cert_lifecycle.js && node tests/integration/test_dynamic_assessment.js && node tests/integration/test_automatic_session_end.js",
+    "dev": "node --watch backend/server.js"
+  },
+  "keywords": [
+    "skill-swap",
+    "peer-learning",
+    "time-banking",
+    "trusodb",
+    "ai-quiz",
+    "negative-marking",
+    "vignan-university"
+  ],
+  "author": "Sri Dhanush (Vignan University)",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^2.21.0",
+    "@libsql/client": "^0.18.0",
+    "@supabase/supabase-js": "^2.49.1",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.3.0",
+    "sqlite3": "^5.1.7",
+    "ws": "^8.21.3"
+  }
+}

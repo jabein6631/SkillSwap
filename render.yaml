@@ -1,0 +1,20 @@
+# Render.com Blueprint Infrastructure as Code Deployment Configuration
+services:
+  - type: web
+    name: skillswap-peer-platform
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: npm install
+    startCommand: node backend/database/seed.js && node backend/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+    disk:
+      name: skillswap-data
+      mountPath: /app/backend/database
+      sizeGB: 1
