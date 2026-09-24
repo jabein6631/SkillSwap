@@ -15,7 +15,6 @@ RUN npm ci --only=production
 # Copy application source code
 COPY frontend/ ./frontend/
 COPY backend/ ./backend/
-COPY .env ./
 
 # Expose port
 EXPOSE 3000
