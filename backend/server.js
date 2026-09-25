@@ -122,10 +122,17 @@ app.use(errorHandler);
 // ==========================================
 // WebSocket Real-Time WebRTC Signaling Server
 // ==========================================
-const wss = new WebSocketServer({ server, path: '/webrtc-signaling' });
+let wss = null;
 const rooms = new Map(); // roomId -> Map(peerId -> { ws, userProfile })
 
-wss.on('connection', (ws) => {
+try {
+  wss = new WebSocketServer({ server, path: '/webrtc-signaling' });
+} catch (err) {
+  console.warn('⚠️ WebSocket Serverless notice:', err.message);
+}
+
+if (wss) {
+  wss.on('connection', (ws) => {
   let currentRoomId = null;
   let currentPeerId = null;
 
@@ -363,15 +370,17 @@ function broadcastSupportEvent(eventData) {
     ...eventData
   });
 
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) { // WebSocket.OPEN
-      try {
-        client.send(message);
-      } catch (err) {
-        // Silently ignore individual send errors
+  if (wss && wss.clients) {
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) { // WebSocket.OPEN
+        try {
+          client.send(message);
+        } catch (err) {
+          // Silently ignore individual send errors
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 /**
@@ -384,15 +393,17 @@ function broadcastChatEvent(chatData) {
     ...chatData
   });
 
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) { // WebSocket.OPEN
-      try {
-        client.send(message);
-      } catch (err) {
-        // Silently ignore individual send errors
+  if (wss && wss.clients) {
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) { // WebSocket.OPEN
+        try {
+          client.send(message);
+        } catch (err) {
+          // Silently ignore individual send errors
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 const { trusodbService } = require('./database/trusodb');
