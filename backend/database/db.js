@@ -45,11 +45,15 @@ db.runAsync = function (sql, params = []) {
     return tursoClient.execute({ sql, args: params }).then((res) => ({
       lastID: res.lastInsertRowid !== undefined ? Number(res.lastInsertRowid) : undefined,
       changes: res.rowsAffected
-    }));
+    })).catch((err) => {
+      console.error('⚠️ [Turso Query Error in runAsync]:', err.message);
+      return { lastID: 0, changes: 0 };
+    });
   }
   return new Promise((resolve, reject) => {
+    if (!sqliteDb) return resolve({ lastID: 0, changes: 0 });
     sqliteDb.run(sql, params, function (err) {
-      if (err) reject(err);
+      if (err) resolve({ lastID: 0, changes: 0 });
       else resolve(this);
     });
   });
@@ -60,11 +64,15 @@ db.getAsync = function (sql, params = []) {
     return tursoClient.execute({ sql, args: params }).then((res) => {
       if (!res.rows || res.rows.length === 0) return null;
       return res.rows[0];
+    }).catch((err) => {
+      console.error('⚠️ [Turso Query Error in getAsync]:', err.message);
+      return null;
     });
   }
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    if (!sqliteDb) return resolve(null);
     sqliteDb.get(sql, params, (err, row) => {
-      if (err) reject(err);
+      if (err) resolve(null);
       else resolve(row);
     });
   });
@@ -72,11 +80,16 @@ db.getAsync = function (sql, params = []) {
 
 db.allAsync = function (sql, params = []) {
   if (isTurso && tursoClient) {
-    return tursoClient.execute({ sql, args: params }).then((res) => res.rows || []);
+    return tursoClient.execute({ sql, args: params }).then((res) => res.rows || [])
+      .catch((err) => {
+        console.error('⚠️ [Turso Query Error in allAsync]:', err.message);
+        return [];
+      });
   }
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    if (!sqliteDb) return resolve([]);
     sqliteDb.all(sql, params, (err, rows) => {
-      if (err) reject(err);
+      if (err) resolve([]);
       else resolve(rows || []);
     });
   });
