@@ -19,5 +19,5 @@ EXPOSE 3000
 # Environment variables
 ENV NODE_ENV=production
 
-# Seed database and start server
-CMD ["sh", "-c", "node backend/database/seed.js && node backend/server.js"]
+# Start server
+CMD ["node", "backend/server.js"]

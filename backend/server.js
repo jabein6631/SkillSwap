@@ -392,6 +392,7 @@ function broadcastChatEvent(chatData) {
 }
 
 const { trusodbService } = require('./database/trusodb');
+const { seedDatabase } = require('./database/seed');
 
 // Initialize DB and Boot Server
 async function startServer() {
@@ -404,6 +405,9 @@ async function startServer() {
       console.log(`🎥 Real-Time WebRTC Video & Zoom Hub: Active on /webrtc-signaling`);
       console.log(`⏱️ Automatic Live Session Expiration Engine: Active (10s interval)`);
       console.log(`========================================================\n`);
+
+      // Asynchronous background seeding
+      seedDatabase().catch(err => console.error('⚠️ [Background Seed Notice]:', err.message));
     });
 
     // Periodic Background Worker: Automatically end expired sessions & broadcast session-ended event
