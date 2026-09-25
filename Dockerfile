@@ -18,6 +18,7 @@ EXPOSE 3000
 
 # Environment variables
 ENV NODE_ENV=production
+ENV PORT=3000
 
 # Start server
 CMD ["node", "backend/server.js"]
