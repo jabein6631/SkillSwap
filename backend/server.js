@@ -437,10 +437,9 @@ async function startServer() {
   } catch (err) {
     console.error('❌ Failed to start SkillSwap server:', err);
     process.exit(1);
-  }
+if (require.main === module) {
+  startServer();
 }
-
-startServer();
 
 module.exports = { app, server, wss, broadcastSupportEvent, broadcastChatEvent };
 
