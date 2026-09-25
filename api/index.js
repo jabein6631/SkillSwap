@@ -39,6 +39,4 @@ app.get('*', (req, res) => {
   res.sendFile(indexPath);
 });
 
-module.exports = (req, res) => {
-  return app(req, res);
-};
+module.exports = app;

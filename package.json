@@ -2,7 +2,7 @@
   "name": "skill-swap-platform",
   "version": "1.0.0",
   "description": "SkillSwap: Cashless Peer-to-Peer Skill Exchange with AI Dynamic 20-Q Assessment, Negative Marking (+3/-1/0), and 4-Tier Tutor Classification for Vignan University",
-  "main": "backend/server.js",
+  "main": "api/index.js",
   "scripts": {
     "build": "echo 'SkillSwap build complete'",
     "start": "node backend/server.js",
