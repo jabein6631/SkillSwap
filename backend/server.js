@@ -359,6 +359,7 @@ if (wss) {
     handlePeerLeave(currentRoomId, currentPeerId);
   });
 });
+}
 
 /**
  * Real-time event broadcaster to all connected clients (for Instant Support Hub updates)
@@ -452,6 +453,9 @@ async function startServer() {
   } catch (err) {
     console.error('❌ Failed to start SkillSwap server:', err);
     process.exit(1);
+  }
+}
+
 if (require.main === module) {
   startServer();
 }
