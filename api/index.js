@@ -11,6 +11,35 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+const { initSchema } = require('../backend/database/db');
+const { seedDatabase } = require('../backend/database/seed');
+
+let isInitialized = false;
+let initPromise = null;
+
+async function ensureDbInitialized() {
+  if (isInitialized) return;
+  if (!initPromise) {
+    initPromise = (async () => {
+      try {
+        console.log('⚡ Initializing production database schema & seed data...');
+        await initSchema();
+        await seedDatabase();
+        isInitialized = true;
+        console.log('✅ Production database schema & seed data ready!');
+      } catch (err) {
+        console.error('⚠️ Production DB init notice:', err.message);
+      }
+    })();
+  }
+  return initPromise;
+}
+
+app.use(async (req, res, next) => {
+  await ensureDbInitialized();
+  next();
+});
+
 try {
   const { attachUserContext } = require('../backend/middleware/auth');
   app.use(attachUserContext);
