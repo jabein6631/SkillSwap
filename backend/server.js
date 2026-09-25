@@ -113,7 +113,17 @@ app.get('*', (req, res, next) => {
   if (['.css', '.js', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.map'].includes(ext)) {
     return res.status(404).type('text/plain').send('Static asset not found: ' + req.path);
   }
-  res.sendFile(path.join(frontendPath, 'index.html'));
+  const candidates = [
+    path.join(frontendPath, 'index.html'),
+    path.join(process.cwd(), 'frontend', 'index.html'),
+    path.join(__dirname, '../frontend', 'index.html')
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      return res.sendFile(p);
+    }
+  }
+  res.status(404).send('SkillSwap index.html file not found');
 });
 
 // Centralized Error Handling Middleware
