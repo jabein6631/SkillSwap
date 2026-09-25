@@ -394,20 +394,21 @@ function broadcastChatEvent(chatData) {
 const { trusodbService } = require('./database/trusodb');
 const { seedDatabase } = require('./database/seed');
 
-// Initialize DB and Boot Server
-async function startServer() {
+// Boot Server and Initialize DB
+function startServer() {
   try {
-    await initSchema();
     server.listen(PORT, '0.0.0.0', () => {
       console.log(`\n========================================================`);
-      console.log(`🚀 SkillSwap Platform Live: http://localhost:${PORT}`);
+      console.log(`🚀 SkillSwap Platform Live: http://0.0.0.0:${PORT}`);
       console.log(`📚 Frontend Path: ${frontendPath}`);
       console.log(`🎥 Real-Time WebRTC Video & Zoom Hub: Active on /webrtc-signaling`);
       console.log(`⏱️ Automatic Live Session Expiration Engine: Active (10s interval)`);
       console.log(`========================================================\n`);
 
-      // Asynchronous background seeding
-      seedDatabase().catch(err => console.error('⚠️ [Background Seed Notice]:', err.message));
+      // Asynchronous Schema Initialization & Seeding in background
+      initSchema().then(() => {
+        return seedDatabase();
+      }).catch(err => console.error('⚠️ [DB Init/Seed Notice]:', err.message));
     });
 
     // Periodic Background Worker: Automatically end expired sessions & broadcast session-ended event
