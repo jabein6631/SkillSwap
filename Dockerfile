@@ -1,4 +1,4 @@
-# Stage 1: Base image
+# SkillSwap Production Dockerfile v2.0 - Clean Build (No .env Dependency)
 FROM node:20-alpine AS base
 
 WORKDIR /app
@@ -10,7 +10,7 @@ RUN apk add --no-cache python3 make g++
 COPY package*.json ./
 
 # Install production dependencies
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Copy application source code
 COPY frontend/ ./frontend/
