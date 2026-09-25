@@ -1,6 +1,5 @@
 require('dotenv').config();
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
 const { createClient } = require('@libsql/client');
 
 const TURSO_URL = process.env.TURSO_DATABASE_URL;
@@ -24,14 +23,19 @@ if (TURSO_URL && TURSO_TOKEN) {
 }
 
 if (!isTurso) {
-  const DB_PATH = path.join(__dirname, 'skillswap.db');
-  sqliteDb = new sqlite3.Database(DB_PATH, (err) => {
-    if (err) {
-      console.error('❌ Error opening SQLite database:', err.message);
-    } else {
-      console.log('✅ Local SQLite database connected at:', DB_PATH);
-    }
-  });
+  try {
+    const sqlite3 = require('sqlite3').verbose();
+    const DB_PATH = path.join(__dirname, 'skillswap.db');
+    sqliteDb = new sqlite3.Database(DB_PATH, (err) => {
+      if (err) {
+        console.error('❌ Error opening SQLite database:', err.message);
+      } else {
+        console.log('✅ Local SQLite database connected at:', DB_PATH);
+      }
+    });
+  } catch (err) {
+    console.warn('⚠️ SQLite native module fallback unavailable:', err.message);
+  }
 }
 
 const db = {};

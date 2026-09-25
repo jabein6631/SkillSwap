@@ -36,11 +36,15 @@ app.use(attachUserContext);
 
 const fs = require('fs');
 
-// Ensure uploads/voice directory exists
+// Ensure uploads/voice directory exists safely
 const uploadsPath = path.join(__dirname, '../uploads');
 const voiceUploadsPath = path.join(uploadsPath, 'voice');
-if (!fs.existsSync(voiceUploadsPath)) {
-  fs.mkdirSync(voiceUploadsPath, { recursive: true });
+try {
+  if (!fs.existsSync(voiceUploadsPath)) {
+    fs.mkdirSync(voiceUploadsPath, { recursive: true });
+  }
+} catch (err) {
+  console.warn('⚠️ Serverless read-only filesystem notice:', err.message);
 }
 
 // Serve Uploads directory statically with HTTP byte-ranges enabled for smooth audio streaming
