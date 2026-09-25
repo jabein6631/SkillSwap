@@ -161,11 +161,15 @@ async function seedDatabase() {
   ];
 
   for (const u of users) {
-    await db.runAsync(
-      `INSERT INTO users (id, email, password_hash, role, name, college, major, avatar, bio, credits, escrow_locked, lifetime_earned, lifetime_spent, rating, reviews_count, badges_json, is_admin)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [u.id, u.email, u.password_hash, u.role, u.name, u.college, u.major, u.avatar, u.bio, u.credits, u.escrow_locked, u.lifetime_earned, u.lifetime_spent, u.rating, u.reviews_count, JSON.stringify(u.badges), u.is_admin]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO users (id, email, password_hash, role, name, college, major, avatar, bio, credits, escrow_locked, lifetime_earned, lifetime_spent, rating, reviews_count, badges_json, is_admin)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [u.id, u.email, u.password_hash, u.role, u.name, u.college, u.major, u.avatar, u.bio, u.credits, u.escrow_locked, u.lifetime_earned, u.lifetime_spent, u.rating, u.reviews_count, JSON.stringify(u.badges), u.is_admin]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting user ${u.email}:`, e.message);
+    }
   }
 
   // 2. Seed Authorized Certificates (NPTEL, Coursera, AWS, CompTIA)
@@ -239,11 +243,15 @@ async function seedDatabase() {
   ];
 
   for (const c of certs) {
-    await db.runAsync(
-      `INSERT INTO certificates (id, user_id, skill_name, authority, title, credential_id, credential_url, score_or_grade, is_verified)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [c.id, c.user_id, c.skill_name, c.authority, c.title, c.credential_id, c.credential_url, c.score_or_grade, c.is_verified]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO certificates (id, user_id, skill_name, authority, title, credential_id, credential_url, score_or_grade, is_verified)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [c.id, c.user_id, c.skill_name, c.authority, c.title, c.credential_id, c.credential_url, c.score_or_grade, c.is_verified]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting certificate ${c.id}:`, e.message);
+    }
   }
 
   // 3. Seed Skills Offered with the 4 Exact Tutor Categories:
@@ -276,11 +284,15 @@ async function seedDatabase() {
 
   for (const s of skillsOffered) {
     const bonusAwarded = (s.quiz_score >= 70 && s.cert_count >= 1) ? 1 : 0;
-    await db.runAsync(
-      `INSERT INTO skills_offered (id, user_id, name, level, category, rate, tier, description, is_verified, quiz_score, cert_count, qualification_bonus_awarded)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [s.id, s.user_id, s.name, s.level, s.category, s.rate, s.tier, s.desc, s.is_verified, s.quiz_score, s.cert_count, bonusAwarded]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO skills_offered (id, user_id, name, level, category, rate, tier, description, is_verified, quiz_score, cert_count, qualification_bonus_awarded)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [s.id, s.user_id, s.name, s.level, s.category, s.rate, s.tier, s.desc, s.is_verified, s.quiz_score, s.cert_count, bonusAwarded]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting skill_offered ${s.id}:`, e.message);
+    }
   }
 
   // 4. Seed Skills Wanted
@@ -296,11 +308,15 @@ async function seedDatabase() {
   ];
 
   for (const sw of skillsWanted) {
-    await db.runAsync(
-      `INSERT INTO skills_wanted (id, user_id, name, level, category, goal)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [sw.id, sw.user_id, sw.name, sw.level, sw.category, sw.goal]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO skills_wanted (id, user_id, name, level, category, goal)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [sw.id, sw.user_id, sw.name, sw.level, sw.category, sw.goal]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting skill_wanted ${sw.id}:`, e.message);
+    }
   }
 
   // 5. Seed Domain Qualification Quizzes
@@ -312,11 +328,15 @@ async function seedDatabase() {
   ];
 
   for (const q of quizzes) {
-    await db.runAsync(
-      `INSERT INTO quizzes (id, skill_name, category, title, passing_score, time_limit_minutes)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [q.id, q.skill_name, q.category, q.title, q.passing_score, q.time_limit_minutes]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO quizzes (id, skill_name, category, title, passing_score, time_limit_minutes)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [q.id, q.skill_name, q.category, q.title, q.passing_score, q.time_limit_minutes]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting quiz ${q.id}:`, e.message);
+    }
   }
 
   // 6. Seed Quiz Questions
@@ -360,19 +380,27 @@ async function seedDatabase() {
   ];
 
   for (const qq of questions) {
-    await db.runAsync(
-      `INSERT INTO quiz_questions (id, quiz_id, question, code_snippet, options_json, correct_option_index, explanation)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [qq.id, qq.quiz_id, qq.question, qq.code_snippet, JSON.stringify(qq.options), qq.correct_index, qq.explanation]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO quiz_questions (id, quiz_id, question, code_snippet, options_json, correct_option_index, explanation)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [qq.id, qq.quiz_id, qq.question, qq.code_snippet, JSON.stringify(qq.options), qq.correct_index, qq.explanation]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting quiz_question ${qq.id}:`, e.message);
+    }
   }
 
   // 7. Seed Sample Session
-  await db.runAsync(
-    `INSERT INTO sessions (id, teacher_id, student_id, skill, hours, rate, credits, date, time, status, topic, code_workspace)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    ['sess_1', 'rishitha', 'sri', 'UI/UX Design & Figma', 2, 2.5, 5.0, '2026-08-25 (Tomorrow)', '4:00 PM - 6:00 PM', 'Confirmed', 'Figma Auto-layout & Design Tokens Masterclass', '// Collaborative Workspace - UI/UX Design Session\n// Mentor: Rishitha (Elite Master Tutor @ 2.5 Cr/hr) | Learner: Sri Dhanush\n// 5.0 Credits Locked in Escrow']
-  );
+  try {
+    await db.runAsync(
+      `INSERT OR IGNORE INTO sessions (id, teacher_id, student_id, skill, hours, rate, credits, date, time, status, topic, code_workspace)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ['sess_1', 'rishitha', 'sri', 'UI/UX Design & Figma', 2, 2.5, 5.0, '2026-08-25 (Tomorrow)', '4:00 PM - 6:00 PM', 'Confirmed', 'Figma Auto-layout & Design Tokens Masterclass', '// Collaborative Workspace - UI/UX Design Session\n// Mentor: Rishitha (Elite Master Tutor @ 2.5 Cr/hr) | Learner: Sri Dhanush\n// 5.0 Credits Locked in Escrow']
+    );
+  } catch (e) {
+    console.warn('[Seed] Notice inserting sample session sess_1:', e.message);
+  }
 
   // 8. Seed Initial Transactions (Separated per User Profile)
   const txs = [
@@ -411,11 +439,15 @@ async function seedDatabase() {
   ];
 
   for (const t of txs) {
-    await db.runAsync(
-      `INSERT INTO transactions (id, user_id, date, type, description, amount, status, student_name)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [t.id, t.user_id, t.date, t.type, t.desc, t.amount, t.status, t.student]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO transactions (id, user_id, date, type, description, amount, status, student_name)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [t.id, t.user_id, t.date, t.type, t.desc, t.amount, t.status, t.student]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting transaction ${t.id}:`, e.message);
+    }
   }
 
   // 9. Seed Student Reviews (Ratings are calculated based on student feedback!)
@@ -456,19 +488,27 @@ async function seedDatabase() {
   ];
 
   for (const r of reviews) {
-    await db.runAsync(
-      `INSERT INTO reviews (id, session_id, target_user_id, reviewer_name, reviewer_avatar, skill, rating, comment, tags_json)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [r.id, r.session_id, r.target_user_id, r.reviewer_name, r.reviewer_avatar, r.skill, r.rating, r.comment, JSON.stringify(r.tags)]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO reviews (id, session_id, target_user_id, reviewer_name, reviewer_avatar, skill, rating, comment, tags_json)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [r.id, r.session_id, r.target_user_id, r.reviewer_name, r.reviewer_avatar, r.skill, r.rating, r.comment, JSON.stringify(r.tags)]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting review ${r.id}:`, e.message);
+    }
   }
 
   // 10. Seed Messages
-  await db.runAsync(
-    `INSERT INTO messages (id, sender_id, receiver_id, text, time)
-     VALUES (?, ?, ?, ?, ?)`,
-    ['msg_1', 'rishitha', 'sri', 'Hey Sri! Since we are both Elite Master Tutors (Quiz 90%+ & NPTEL/Google UX), let us do a 2-hour swap!', '10:15 AM']
-  );
+  try {
+    await db.runAsync(
+      `INSERT OR IGNORE INTO messages (id, sender_id, receiver_id, text, time)
+       VALUES (?, ?, ?, ?, ?)`,
+      ['msg_1', 'rishitha', 'sri', 'Hey Sri! Since we are both Elite Master Tutors (Quiz 90%+ & NPTEL/Google UX), let us do a 2-hour swap!', '10:15 AM']
+    );
+  } catch (e) {
+    console.warn('[Seed] Notice inserting sample message msg_1:', e.message);
+  }
 
   // 12. Seed Support Tickets (Doubt Sessions & Code Issues)
   const supportTickets = [
@@ -532,44 +572,56 @@ async function seedDatabase() {
   ];
 
   for (const st of supportTickets) {
-    await db.runAsync(
-      `INSERT INTO support_tickets (id, student_id, student_name, session_id, skill_name, eligibility_proof, title, description, code_snippet, issue_type, reward_credits, status, support_mentor_id, support_mentor_name, mentor_classification, mentor_solution, recommended_assessment_skill)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [st.id, st.student_id, st.student_name, st.session_id, st.skill_name, st.eligibility_proof, st.title, st.description, st.code_snippet, st.issue_type, st.reward_credits, st.status, st.support_mentor_id, st.support_mentor_name, st.mentor_classification, st.mentor_solution, st.recommended_assessment_skill]
-    );
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO support_tickets (id, student_id, student_name, session_id, skill_name, eligibility_proof, title, description, code_snippet, issue_type, reward_credits, status, support_mentor_id, support_mentor_name, mentor_classification, mentor_solution, recommended_assessment_skill)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [st.id, st.student_id, st.student_name, st.session_id, st.skill_name, st.eligibility_proof, st.title, st.description, st.code_snippet, st.issue_type, st.reward_credits, st.status, st.support_mentor_id, st.support_mentor_name, st.mentor_classification, st.mentor_solution, st.recommended_assessment_skill]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting support_ticket ${st.id}:`, e.message);
+    }
 
     const doubtStatus = st.status === 'CLAIMED' ? 'ACCEPTED' : st.status;
-    await db.runAsync(
-      `INSERT INTO support_doubts (id, raised_by_user_id, category, course, title, description, code_snippet, status, accepted_by_user_id, accepted_at, reward_credits, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-      [
-        st.id,
-        st.student_id,
-        st.skill_name,
-        st.skill_name,
-        st.title,
-        st.description,
-        st.code_snippet,
-        doubtStatus,
-        st.support_mentor_id,
-        st.support_mentor_id ? new Date().toISOString() : null,
-        st.reward_credits
-      ]
-    );
-
-    if (st.status === 'RESOLVED' && st.mentor_solution) {
+    try {
       await db.runAsync(
-        `INSERT INTO support_answers (id, doubt_id, answered_by_user_id, answer_text, classification, recommended_assessment_skill, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        `INSERT OR IGNORE INTO support_doubts (id, raised_by_user_id, category, course, title, description, code_snippet, status, accepted_by_user_id, accepted_at, reward_credits, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
         [
-          'ans_' + st.id,
           st.id,
+          st.student_id,
+          st.skill_name,
+          st.skill_name,
+          st.title,
+          st.description,
+          st.code_snippet,
+          doubtStatus,
           st.support_mentor_id,
-          st.mentor_solution,
-          st.mentor_classification,
-          st.recommended_assessment_skill
+          st.support_mentor_id ? new Date().toISOString() : null,
+          st.reward_credits
         ]
       );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting support_doubt ${st.id}:`, e.message);
+    }
+
+    if (st.status === 'RESOLVED' && st.mentor_solution) {
+      try {
+        await db.runAsync(
+          `INSERT OR IGNORE INTO support_answers (id, doubt_id, answered_by_user_id, answer_text, classification, recommended_assessment_skill, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+          [
+            'ans_' + st.id,
+            st.id,
+            st.support_mentor_id,
+            st.mentor_solution,
+            st.mentor_classification,
+            st.recommended_assessment_skill
+          ]
+        );
+      } catch (e) {
+        console.warn(`[Seed] Notice inserting support_answer ans_${st.id}:`, e.message);
+      }
     }
   }
 
@@ -583,11 +635,15 @@ async function seedDatabase() {
     return left + right + [node.val]`;
   const samplePyBase64 = `data:text/x-python;base64,${Buffer.from(samplePyCode).toString('base64')}`;
 
-  await db.runAsync(
-    `INSERT INTO support_doubt_attachments (id, doubt_id, file_name, file_type, file_size, file_data)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    ['att_dbt_101_1', 'sup_101', 'tree_traversal.py', 'text/x-python', Buffer.byteLength(samplePyCode), samplePyBase64]
-  );
+  try {
+    await db.runAsync(
+      `INSERT OR IGNORE INTO support_doubt_attachments (id, doubt_id, file_name, file_type, file_size, file_data)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      ['att_dbt_101_1', 'sup_101', 'tree_traversal.py', 'text/x-python', Buffer.byteLength(samplePyCode), samplePyBase64]
+    );
+  } catch (e) {
+    console.warn('[Seed] Notice inserting attachment att_dbt_101_1:', e.message);
+  }
 
   console.log('✅ Database successfully seeded with 4 Tutor Categories, Login Tracking, and Support Team Doubt Tickets & Attachments!');
 }
