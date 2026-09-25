@@ -25,6 +25,10 @@ try {
   console.error('💥 API routes load error:', err);
 }
 
+const errorHandler = require('../backend/middleware/errorHandler');
+app.use('/api', errorHandler);
+app.use(errorHandler);
+
 const frontendPath = path.join(__dirname, '../frontend');
 app.use('/css', express.static(path.join(frontendPath, 'css')));
 app.use('/js', express.static(path.join(frontendPath, 'js')));
