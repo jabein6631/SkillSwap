@@ -77,19 +77,26 @@ const dbProvider = {
   async getUsers(filter = {}) {
     let users = [];
     if (isConnectedToSupabase && supabaseClient) {
-      const { data, error } = await supabaseClient.from('users').select('*').eq('is_admin', 0);
-      if (error) throw error;
-      for (const u of data) {
-        const { data: so } = await supabaseClient.from('skills_offered').select('*').eq('user_id', u.id);
-        const { data: sw } = await supabaseClient.from('skills_wanted').select('*').eq('user_id', u.id);
-        const { data: certs } = await supabaseClient.from('certificates').select('*').eq('user_id', u.id);
-        u.badges = typeof u.badges_json === 'string' ? JSON.parse(u.badges_json) : (u.badges_json || []);
-        u.skillsOffered = so || [];
-        u.skillsWanted = sw || [];
-        u.certificates = certs || [];
+      try {
+        const { data, error } = await supabaseClient.from('users').select('*').eq('is_admin', 0);
+        if (!error && data && data.length > 0) {
+          for (const u of data) {
+            const { data: so } = await supabaseClient.from('skills_offered').select('*').eq('user_id', u.id);
+            const { data: sw } = await supabaseClient.from('skills_wanted').select('*').eq('user_id', u.id);
+            const { data: certs } = await supabaseClient.from('certificates').select('*').eq('user_id', u.id);
+            u.badges = typeof u.badges_json === 'string' ? JSON.parse(u.badges_json) : (u.badges_json || []);
+            u.skillsOffered = so || [];
+            u.skillsWanted = sw || [];
+            u.certificates = certs || [];
+          }
+          users = data;
+        }
+      } catch (e) {
+        console.warn('⚠️ Supabase getUsers notice, falling back to Turso DB:', e.message);
       }
-      users = data;
-    } else {
+    }
+    
+    if (users.length === 0) {
       users = await db.allAsync(`SELECT * FROM users WHERE is_admin = 0`);
       for (const u of users) {
         u.badges = JSON.parse(u.badges_json || '[]');
@@ -133,26 +140,31 @@ const dbProvider = {
 
   async getUserById(id) {
     if (isConnectedToSupabase && supabaseClient) {
-      const { data: user, error } = await supabaseClient.from('users').select('*').eq('id', id).single();
-      if (error) throw error;
-      const { data: so } = await supabaseClient.from('skills_offered').select('*').eq('user_id', id);
-      const { data: sw } = await supabaseClient.from('skills_wanted').select('*').eq('user_id', id);
-      const { data: certs } = await supabaseClient.from('certificates').select('*').eq('user_id', id);
-      const { data: rev } = await supabaseClient.from('reviews').select('*').eq('target_user_id', id).order('created_at', { ascending: false });
-      const { data: txs } = await supabaseClient.from('transactions').select('*').eq('user_id', id).order('created_at', { ascending: false });
-      const { data: attempts } = await supabaseClient.from('quiz_attempts').select('*').eq('user_id', id).order('attempted_at', { ascending: false });
+      try {
+        const { data: user, error } = await supabaseClient.from('users').select('*').eq('id', id).single();
+        if (!error && user) {
+          const { data: so } = await supabaseClient.from('skills_offered').select('*').eq('user_id', id);
+          const { data: sw } = await supabaseClient.from('skills_wanted').select('*').eq('user_id', id);
+          const { data: certs } = await supabaseClient.from('certificates').select('*').eq('user_id', id);
+          const { data: rev } = await supabaseClient.from('reviews').select('*').eq('target_user_id', id).order('created_at', { ascending: false });
+          const { data: txs } = await supabaseClient.from('transactions').select('*').eq('user_id', id).order('created_at', { ascending: false });
+          const { data: attempts } = await supabaseClient.from('quiz_attempts').select('*').eq('user_id', id).order('attempted_at', { ascending: false });
 
-      user.badges = typeof user.badges_json === 'string' ? JSON.parse(user.badges_json) : (user.badges_json || []);
-      user.skillsOffered = so || [];
-      user.skillsWanted = sw || [];
-      user.certificates = certs || [];
-      user.transactions = txs || [];
-      user.quizAttempts = attempts || [];
-      user.reviews = (rev || []).map(r => ({
-        ...r,
-        tags: typeof r.tags_json === 'string' ? JSON.parse(r.tags_json) : (r.tags_json || [])
-      }));
-      return user;
+          user.badges = typeof user.badges_json === 'string' ? JSON.parse(user.badges_json) : (user.badges_json || []);
+          user.skillsOffered = so || [];
+          user.skillsWanted = sw || [];
+          user.certificates = certs || [];
+          user.transactions = txs || [];
+          user.quizAttempts = attempts || [];
+          user.reviews = (rev || []).map(r => ({
+            ...r,
+            tags: typeof r.tags_json === 'string' ? JSON.parse(r.tags_json) : (r.tags_json || [])
+          }));
+          return user;
+        }
+      } catch (e) {
+        console.warn('⚠️ Supabase getUserById notice, falling back to Turso DB:', e.message);
+      }
     }
 
     const user = await db.getAsync(`SELECT * FROM users WHERE id = ?`, [id]);
