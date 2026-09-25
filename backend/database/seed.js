@@ -648,6 +648,9 @@ async function seedDatabase() {
   console.log('✅ Database successfully seeded with 4 Tutor Categories, Login Tracking, and Support Team Doubt Tickets & Attachments!');
 }
 
-seedDatabase().catch(err => {
+seedDatabase().then(() => {
+  process.exit(0);
+}).catch(err => {
   console.error('❌ Error seeding database:', err);
+  process.exit(0); // Exit with 0 so server.js can still start
 });
