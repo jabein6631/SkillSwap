@@ -28,7 +28,9 @@ router.get('/health', (req, res) => {
     platform: 'SkillSwap Peer-to-Peer Hub',
     authSystem: 'JWT + TrusoDB Auth Bridge + RBAC Active',
     roles: ['STUDENT', 'ADMIN'],
-    markingScheme: '+3 for Correct, -1 for Wrong, 0 for Unattempted (Max: 60 Marks)'
+    hasTursoUrl: Boolean(process.env.TURSO_DATABASE_URL),
+    hasTursoToken: Boolean(process.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_NTOKE),
+    tursoUrl: process.env.TURSO_DATABASE_URL || null
   });
 });
 

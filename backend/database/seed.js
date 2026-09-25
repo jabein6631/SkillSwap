@@ -499,6 +499,31 @@ async function seedDatabase() {
     }
   }
 
+  // 9.5. Seed Verified Certificates for Tutors
+  const seedCerts = [
+    { id: 'cert_sri_1', user_id: 'sri', skill_name: 'Python Core & OOP', authority: 'NPTEL / IIT Madras', title: 'NPTEL Elite+Gold Python Programming', credential_id: 'NPTEL26CS9401', credential_url: 'https://nptel.ac.in', score_or_grade: '94%', is_verified: 1, certificate_status: 'VERIFIED', verification_status: 'VERIFIED', tutor_eligible: 1, verification_method: 'AUTOMATED_CRON_AI', verification_reason: 'Verified by NPTEL Portal API' },
+    { id: 'cert_rish_1', user_id: 'rishitha', skill_name: 'UI/UX Design & Figma', authority: 'Google / Coursera', title: 'Google UX Design Professional Certificate', credential_id: 'COURSERAGUX901', credential_url: 'https://coursera.org', score_or_grade: '98%', is_verified: 1, certificate_status: 'VERIFIED', verification_status: 'VERIFIED', tutor_eligible: 1, verification_method: 'AUTOMATED_CRON_AI', verification_reason: 'Verified by Coursera API' },
+    { id: 'cert_bha_1', user_id: 'bharath', skill_name: 'React.js Frontend', authority: 'Amazon Web Services', title: 'AWS Certified Developer - Associate', credential_id: 'AWSDEV88192', credential_url: 'https://aws.amazon.com', score_or_grade: 'Pass', is_verified: 1, certificate_status: 'VERIFIED', verification_status: 'VERIFIED', tutor_eligible: 1, verification_method: 'AUTOMATED_CRON_AI', verification_reason: 'Verified by AWS Certification Portal' },
+    { id: 'cert_puj_1', user_id: 'pujitha', skill_name: 'SQL & Database Design', authority: 'NPTEL / IIT Kharagpur', title: 'NPTEL DBMS & SQL Master Certification', credential_id: 'NPTEL26CS8821', credential_url: 'https://nptel.ac.in', score_or_grade: '91%', is_verified: 1, certificate_status: 'VERIFIED', verification_status: 'VERIFIED', tutor_eligible: 1, verification_method: 'AUTOMATED_CRON_AI', verification_reason: 'Verified by NPTEL Portal API' },
+    { id: 'cert_tam_1', user_id: 'taman', skill_name: 'Data Structures & Algorithms', authority: 'HackerRank', title: 'HackerRank Problem Solving (Advanced)', credential_id: 'HRPSADV551', credential_url: 'https://hackerrank.com', score_or_grade: 'Gold Badge', is_verified: 1, certificate_status: 'VERIFIED', verification_status: 'VERIFIED', tutor_eligible: 1, verification_method: 'AUTOMATED_CRON_AI', verification_reason: 'Verified by HackerRank API' },
+    { id: 'cert_adm_1', user_id: 'admin', skill_name: 'General Tech', authority: 'Vignan University', title: 'Faculty Master Tutor Certification', credential_id: 'VIGNAN-FAC-001', credential_url: 'https://vignan.ac.in', score_or_grade: '100%', is_verified: 1, certificate_status: 'VERIFIED', verification_status: 'VERIFIED', tutor_eligible: 1, verification_method: 'ADMIN_MANUAL_VERIFIED', verification_reason: 'Faculty Master Tutor Administrator' }
+  ];
+
+  for (const c of seedCerts) {
+    try {
+      await db.runAsync(
+        `INSERT OR IGNORE INTO certificates (
+          id, user_id, skill_name, authority, title, credential_id, credential_url, score_or_grade,
+          is_verified, certificate_status, verification_status, tutor_eligible, verification_method,
+          verification_reason, verified_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+        [c.id, c.user_id, c.skill_name, c.authority, c.title, c.credential_id, c.credential_url, c.score_or_grade, c.is_verified, c.certificate_status, c.verification_status, c.tutor_eligible, c.verification_method, c.verification_reason]
+      );
+    } catch (e) {
+      console.warn(`[Seed] Notice inserting certificate ${c.id}:`, e.message);
+    }
+  }
+
   // 10. Seed Messages
   try {
     await db.runAsync(
@@ -651,10 +676,5 @@ async function seedDatabase() {
 seedDatabase().catch(err => {
   console.error('❌ Error seeding database:', err);
 });
-  }).catch (err => {
-  console.error('❌ Error seeding database:', err);
-  process.exit(0);
-});
-}
 
 module.exports = { seedDatabase };

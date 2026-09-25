@@ -2665,7 +2665,15 @@
           image_url: thumbnailUrl
         };
 
-        const res = await fetch('/api/sessions/cohort', {
+        const reqUrl = '/api/sessions/cohort';
+        console.log('🚀 [Masterclass Creation API Request]:', {
+          url: reqUrl,
+          method: 'POST',
+          payload,
+          hasToken: Boolean(window.store.token)
+        });
+
+        const res = await fetch(reqUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2674,9 +2682,28 @@
           body: JSON.stringify(payload)
         });
 
-        const data = await res.json();
+        let data = {};
+        let rawText = '';
+        try {
+          rawText = await res.text();
+          data = JSON.parse(rawText);
+        } catch (e) {
+          data = { error: rawText || 'Non-JSON Server Response' };
+        }
+
+        console.log('📥 [Masterclass Creation API Response]:', {
+          status: res.status,
+          statusText: res.statusText,
+          data,
+          rawText
+        });
+
         if (!res.ok) {
-          throw new Error(data.message || 'Failed to create Masterclass');
+          const serverErrMsg = data.error || data.message || rawText || 'Failed to create Masterclass';
+          const diagError = new Error(`HTTP ${res.status} (${res.statusText})\nURL: ${reqUrl}\nBackend Error: ${serverErrMsg}`);
+          diagError.status = res.status;
+          diagError.data = data;
+          throw diagError;
         }
 
         if (status === 'DRAFT') {
@@ -2696,7 +2723,8 @@
         this.switchSessionsTab(status === 'DRAFT' ? 'MASTERCLASSES' : 'GROUPS');
         history.pushState(null, '', '/sessions');
       } catch (err) {
-        alert('Error: ' + err.message);
+        console.error('💥 [Masterclass Creation Error Details]:', err);
+        alert('Diagnostic Error Details:\n' + err.message);
       } finally {
         if (submitBtn) submitBtn.disabled = false;
         if (draftBtn) draftBtn.disabled = false;
