@@ -1,16 +1,13 @@
-# SkillSwap Production Dockerfile v2.0 - Clean Build (No .env Dependency)
-FROM node:20-alpine AS base
+# SkillSwap Production Dockerfile - Node 20 Debian GLIBC Image
+FROM node:20
 
 WORKDIR /app
-
-# Install build dependencies for native modules (sqlite3)
-RUN apk add --no-cache python3 make g++
 
 # Copy dependency manifests
 COPY package*.json ./
 
 # Install production dependencies
-RUN npm install --omit=dev
+RUN npm install --production
 
 # Copy application source code
 COPY frontend/ ./frontend/
