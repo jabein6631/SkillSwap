@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "frontend/**"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -16,7 +11,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/api/index.js"
+      "destination": "/frontend/$1"
     }
   ]
 }
