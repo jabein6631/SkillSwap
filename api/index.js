@@ -7,7 +7,8 @@ const { seedDatabase } = require('../backend/database/seed');
 
 let isInitialized = false;
 
-module.exports = async (req, res) => {
+// Middleware for lazy initialization of Turso Cloud DB on Vercel
+app.use(async (req, res, next) => {
   if (!isInitialized) {
     try {
       await initSchema();
@@ -17,5 +18,7 @@ module.exports = async (req, res) => {
     }
     isInitialized = true;
   }
-  return app(req, res);
-};
+  next();
+});
+
+module.exports = app;
