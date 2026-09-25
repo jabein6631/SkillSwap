@@ -10166,9 +10166,12 @@
             updateProgressUI(playerObj);
           })
           .catch(e => {
-            console.warn('Audio playback start restricted/failed:', e);
+            console.warn('Audio playback start notice:', e.message || e);
             updateProgressUI(playerObj);
-            this.showToast('Could not play audio: ' + (e.message || 'Playback blocked'), 'triangle-exclamation');
+            const isAbort = e.name === 'AbortError' || (e.message && e.message.includes('interrupted'));
+            if (!isAbort) {
+              this.showToast('Could not play audio: ' + (e.message || 'Playback blocked'), 'triangle-exclamation');
+            }
           });
       }
     },

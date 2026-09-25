@@ -12,26 +12,35 @@ if (!fs.existsSync(voiceDir)) {
   fs.mkdirSync(voiceDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, voiceDir);
-  },
-  filename: (req, file, cb) => {
-    let ext = 'webm';
-    if (file.mimetype) {
-      if (file.mimetype.includes('mp4')) ext = 'mp4';
-      else if (file.mimetype.includes('ogg')) ext = 'ogg';
-      else if (file.mimetype.includes('wav')) ext = 'wav';
-      else if (file.mimetype.includes('aac')) ext = 'aac';
-    }
-    const origExt = path.extname(file.originalname).replace('.', '').toLowerCase();
-    if (['webm', 'mp4', 'ogg', 'wav', 'aac'].includes(origExt)) {
-      ext = origExt;
-    }
-    const uniqueSuffix = Date.now() + '-' + Math.random().toString(36).substring(2, 8);
-    cb(null, `voice-${uniqueSuffix}.${ext}`);
+let storage;
+if (process.env.VERCEL) {
+  storage = multer.memoryStorage();
+} else {
+  try {
+    storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, voiceDir);
+      },
+      filename: (req, file, cb) => {
+        let ext = 'webm';
+        if (file.mimetype) {
+          if (file.mimetype.includes('mp4')) ext = 'mp4';
+          else if (file.mimetype.includes('ogg')) ext = 'ogg';
+          else if (file.mimetype.includes('wav')) ext = 'wav';
+          else if (file.mimetype.includes('aac')) ext = 'aac';
+        }
+        const origExt = path.extname(file.originalname).replace('.', '').toLowerCase();
+        if (['webm', 'mp4', 'ogg', 'wav', 'aac'].includes(origExt)) {
+          ext = origExt;
+        }
+        const uniqueSuffix = Date.now() + '-' + Math.random().toString(36).substring(2, 8);
+        cb(null, `voice-${uniqueSuffix}.${ext}`);
+      }
+    });
+  } catch (e) {
+    storage = multer.memoryStorage();
   }
-});
+}
 
 const fileFilter = (req, file, cb) => {
   const isAudio = file.mimetype && (

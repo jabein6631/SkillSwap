@@ -36,7 +36,13 @@ const chatController = {
       if (req.file.size === 0) {
         return res.status(400).json({ success: false, error: 'Unable to record audio. Audio blob is empty.' });
       }
-      const audioUrl = `/uploads/voice/${req.file.filename}`;
+      let audioUrl = '';
+      if (req.file.buffer) {
+        const mime = req.file.mimetype || 'audio/webm';
+        audioUrl = `data:${mime};base64,${req.file.buffer.toString('base64')}`;
+      } else {
+        audioUrl = `/uploads/voice/${req.file.filename}`;
+      }
       const duration = Number(req.body.duration || req.body.audioDuration || 0);
 
       res.json({
@@ -44,7 +50,7 @@ const chatController = {
         audioUrl,
         audio_url: audioUrl,
         duration,
-        filename: req.file.filename,
+        filename: req.file.filename || 'voice-note',
         mimetype: req.file.mimetype,
         size: req.file.size
       });
