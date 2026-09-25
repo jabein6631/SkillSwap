@@ -162,14 +162,11 @@ async function seedDatabase() {
 
   for (const u of users) {
     try {
-      const existing = await db.getAsync('SELECT id FROM users WHERE email = ? OR id = ?', [u.email, u.id]);
-      if (!existing) {
-        await db.runAsync(
-          `INSERT INTO users (id, email, password_hash, role, name, college, major, avatar, bio, credits, escrow_locked, lifetime_earned, lifetime_spent, rating, reviews_count, badges_json, is_admin)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [u.id, u.email, u.password_hash, u.role, u.name, u.college, u.major, u.avatar, u.bio, u.credits, u.escrow_locked, u.lifetime_earned, u.lifetime_spent, u.rating, u.reviews_count, JSON.stringify(u.badges), u.is_admin]
-        );
-      }
+      await db.runAsync(
+        `INSERT OR IGNORE INTO users (id, email, password_hash, role, name, college, major, avatar, bio, credits, escrow_locked, lifetime_earned, lifetime_spent, rating, reviews_count, badges_json, is_admin)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [u.id, u.email, u.password_hash, u.role, u.name, u.college, u.major, u.avatar, u.bio, u.credits, u.escrow_locked, u.lifetime_earned, u.lifetime_spent, u.rating, u.reviews_count, JSON.stringify(u.badges), u.is_admin]
+      );
     } catch (e) {
       console.warn(`[Seed] Notice inserting user ${u.email}:`, e.message);
     }
@@ -651,13 +648,13 @@ async function seedDatabase() {
   console.log('✅ Database successfully seeded with 4 Tutor Categories, Login Tracking, and Support Team Doubt Tickets & Attachments!');
 }
 
-if (require.main === module) {
-  seedDatabase().then(() => {
-    process.exit(0);
-  }).catch(err => {
-    console.error('❌ Error seeding database:', err);
-    process.exit(0);
-  });
+seedDatabase().catch(err => {
+  console.error('❌ Error seeding database:', err);
+});
+  }).catch (err => {
+  console.error('❌ Error seeding database:', err);
+  process.exit(0);
+});
 }
 
 module.exports = { seedDatabase };
