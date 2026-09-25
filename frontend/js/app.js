@@ -2699,11 +2699,8 @@
         });
 
         if (!res.ok) {
-          const serverErrMsg = data.error || data.message || rawText || 'Failed to create Masterclass';
-          const diagError = new Error(`HTTP ${res.status} (${res.statusText})\nURL: ${reqUrl}\nBackend Error: ${serverErrMsg}`);
-          diagError.status = res.status;
-          diagError.data = data;
-          throw diagError;
+          const serverErrMsg = data.error || data.message || 'Failed to create Masterclass';
+          throw new Error(serverErrMsg);
         }
 
         if (status === 'DRAFT') {
@@ -2724,7 +2721,7 @@
         history.pushState(null, '', '/sessions');
       } catch (err) {
         console.error('💥 [Masterclass Creation Error Details]:', err);
-        alert('Diagnostic Error Details:\n' + err.message);
+        alert('Error: ' + err.message);
       } finally {
         if (submitBtn) submitBtn.disabled = false;
         if (draftBtn) draftBtn.disabled = false;
