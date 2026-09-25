@@ -4,7 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const { createClient } = require('@libsql/client');
 
 const TURSO_URL = process.env.TURSO_DATABASE_URL;
-const TURSO_TOKEN = process.env.TURSO_AUTH_TOKEN;
+const TURSO_TOKEN = process.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_NTOKE;
 
 let isTurso = false;
 let tursoClient = null;
