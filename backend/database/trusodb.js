@@ -1220,7 +1220,11 @@ const dbProvider = {
     }
 
     // 2. Fetch tutor and calculate rate
-    const tutor = await db.getAsync(`SELECT * FROM users WHERE id = ?`, [tutorId]);
+    const tutorIdStr = String(tutorId || '').trim();
+    const tutor = await db.getAsync(
+      `SELECT * FROM users WHERE id = ? OR LOWER(name) = ? OR LOWER(email) = ?`,
+      [tutorIdStr, tutorIdStr.toLowerCase(), tutorIdStr.toLowerCase()]
+    );
     if (!tutor) throw new Error('Selected mentor was not found');
     if (!tutor.is_verified) {
       throw new Error('This mentor has not passed certificate verification and is not eligible to take bookings.');
