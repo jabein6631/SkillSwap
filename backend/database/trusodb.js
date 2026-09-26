@@ -2377,6 +2377,9 @@ const dbProvider = {
   },
 
   async getUserSessionsCategorized(userId) {
+    const targetUser = await db.getAsync(`SELECT * FROM users WHERE id = ? OR LOWER(email) = ?`, [userId, String(userId).toLowerCase()]);
+    const userEmail = (targetUser?.email || '').toLowerCase();
+
     const allSessions = await this.getSessions();
     const reviews = await db.allAsync(`SELECT * FROM reviews`);
 
@@ -2395,27 +2398,35 @@ const dbProvider = {
       } : null
     }));
 
+    const isUserMatch = (id) => {
+      if (!id) return false;
+      const sId = String(id).toLowerCase();
+      if (sId === String(userId).toLowerCase()) return true;
+      if (userEmail && sId === userEmail) return true;
+      return false;
+    };
+
     // Filter per category
     const userRelevant = enriched.filter(s =>
-      s.teacher_id === userId ||
-      s.student_id === userId ||
-      (s.attendees || []).some(a => a.student_id === userId)
+      isUserMatch(s.teacher_id) ||
+      isUserMatch(s.student_id) ||
+      (s.attendees || []).some(a => isUserMatch(a.student_id))
     );
 
-    // Requests for mentor (status === 'PENDING' OR student-cancelled requests OR mentor-declined requests for status tracking)
+    // Requests for mentor
     const requests = enriched.filter(s =>
-      s.teacher_id === userId &&
+      isUserMatch(s.teacher_id) &&
       s.session_type !== 'GROUP_COHORT' &&
       (
         (s.status && s.status.toUpperCase() === 'PENDING') ||
-        (s.status && s.status.toUpperCase() === 'CANCELLED' && s.cancelled_by === s.student_id) ||
+        (s.status && s.status.toUpperCase() === 'CANCELLED' && isUserMatch(s.cancelled_by)) ||
         (s.status && s.status.toUpperCase() === 'DECLINED')
       )
     );
     
     // Pending or mentor-declined requests for student
     const studentPending = enriched.filter(s =>
-      s.student_id === userId &&
+      isUserMatch(s.student_id) &&
       s.session_type !== 'GROUP_COHORT' &&
       (
         (s.status && s.status.toUpperCase() === 'PENDING') ||
@@ -2431,7 +2442,7 @@ const dbProvider = {
     });
 
     const past = userRelevant.filter(s => s.status && (s.status.toLowerCase() === 'completed' || s.status.toLowerCase() === 'attendance_finalized'));
-    const masterclasses = enriched.filter(s => s.teacher_id === userId && s.session_type === 'GROUP_COHORT');
+    const masterclasses = enriched.filter(s => isUserMatch(s.teacher_id) && s.session_type === 'GROUP_COHORT');
     const groups = enriched.filter(s => s.session_type === 'GROUP_COHORT' && s.status && s.status.toLowerCase() !== 'cancelled');
     const cancelled = userRelevant.filter(s => s.status && (s.status.toLowerCase() === 'cancelled' || s.status.toUpperCase() === 'CANCELLED' || s.status.toUpperCase() === 'DECLINED'));
 

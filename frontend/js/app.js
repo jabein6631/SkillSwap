@@ -2772,11 +2772,12 @@
         this.updateMasterclassPreview();
 
         await window.store.fetchSessions();
+        await window.store.fetchMySessions();
         this.renderNavbar();
         await this.renderSessions();
 
         this.switchView('view-sessions');
-        this.switchSessionsTab(status === 'DRAFT' ? 'MASTERCLASSES' : 'GROUPS');
+        this.switchSessionsTab(status === 'DRAFT' ? 'MASTERCLASSES' : 'UPCOMING');
         history.pushState(null, '', '/sessions');
       } catch (err) {
         console.error('💥 [Masterclass Creation Error Details]:', err);
