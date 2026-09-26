@@ -47,7 +47,7 @@ db.runAsync = function (sql, params = []) {
       changes: res.rowsAffected
     })).catch((err) => {
       console.error('⚠️ [Turso Query Error in runAsync]:', err.message);
-      return { lastID: 0, changes: 0 };
+      throw err;
     });
   }
   return new Promise((resolve, reject) => {
