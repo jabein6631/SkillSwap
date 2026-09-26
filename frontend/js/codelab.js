@@ -1050,48 +1050,6 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
 
         <!-- Dynamic Step Content -->
         ${isStep1 ? this.renderStep1Html() : (isStep2 ? this.renderStep2Html() : this.renderStep3Html())}
-
-        <!-- Bottom Feature Ribbon (Steps 1 & 2) -->
-        ${!isStep3 ? `
-          <div class="codelab-feature-ribbon">
-            <div class="codelab-ribbon-item">
-              <div class="codelab-ribbon-icon" style="color: #2563eb;">
-                <i class="fa-solid fa-chart-simple"></i>
-              </div>
-              <div>
-                <h4 class="codelab-ribbon-title">Improve Skills</h4>
-                <p class="codelab-ribbon-desc">Solve problems and track progress</p>
-              </div>
-            </div>
-            <div class="codelab-ribbon-item">
-              <div class="codelab-ribbon-icon" style="color: #eab308;">
-                <i class="fa-solid fa-award"></i>
-              </div>
-              <div>
-                <h4 class="codelab-ribbon-title">Earn Badges</h4>
-                <p class="codelab-ribbon-desc">Get recognized for your achievements</p>
-              </div>
-            </div>
-            <div class="codelab-ribbon-item">
-              <div class="codelab-ribbon-icon" style="color: #10b981;">
-                <i class="fa-solid fa-trophy"></i>
-              </div>
-              <div>
-                <h4 class="codelab-ribbon-title">Climb Leaderboard</h4>
-                <p class="codelab-ribbon-desc">Compete with peers</p>
-              </div>
-            </div>
-            <div class="codelab-ribbon-item">
-              <div class="codelab-ribbon-icon" style="color: #6366f1;">
-                <i class="fa-solid fa-user-group"></i>
-              </div>
-              <div>
-                <h4 class="codelab-ribbon-title">Get Help</h4>
-                <p class="codelab-ribbon-desc">Stuck? Ask a peer mentor</p>
-              </div>
-            </div>
-          </div>
-        ` : ''}
       </div>
     `;
   }
@@ -1188,7 +1146,7 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
     }).join('')}
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 1.5rem;">
           <button class="btn btn-secondary" onclick="window.codelab.setStep(1)" style="padding: 0.75rem 1.5rem; font-weight: 700;">
             <i class="fa-solid fa-arrow-left" style="margin-right: 0.35rem;"></i> Back to Subjects
           </button>
