@@ -2921,6 +2921,24 @@
         this.navigateToBookingStep(3);
       });
       document.getElementById('btnContinueToReview')?.addEventListener('click', () => {
+        const titleInput = document.getElementById('bookingSessionTitle');
+        const descInput = document.getElementById('bookingSessionDescription');
+        const platformSelect = document.getElementById('bookingMeetingPlatformSelect');
+        const typeSelect = document.getElementById('bookingSessionTypeSelect');
+        const addNotesInput = document.getElementById('bookingAdditionalNotes');
+
+        const title = titleInput?.value?.trim() || `Help with ${this.bookingState.topic || this.bookingState.subject || 'Programming'}`;
+        const desc = descInput?.value?.trim() || `I need guidance and assistance with ${this.bookingState.topic || this.bookingState.subject || 'this session'}.`;
+
+        this.bookingState.title = title;
+        this.bookingState.description = desc;
+        this.bookingState.meetingPlatform = platformSelect?.value || 'Google Meet';
+        this.bookingState.sessionType = typeSelect?.value || '1-on-1 Swap Session';
+        this.bookingState.additionalNotes = addNotesInput?.value?.trim() || '';
+
+        if (titleInput) titleInput.value = title;
+        if (descInput) descInput.value = desc;
+
         this.navigateToBookingStep(5);
       });
 
@@ -3498,17 +3516,26 @@
       const descInput = document.getElementById('bookingSessionDescription');
       const platformSelect = document.getElementById('bookingMeetingPlatformSelect');
       const notesInput = document.getElementById('bookingAdditionalNotes');
+      const typeSelect = document.getElementById('bookingSessionTypeSelect');
+
+      const defaultTitle = `Help with ${this.bookingState.topic || this.bookingState.subject || 'Programming'}`;
+      const defaultDesc = this.bookingState.subjectNotes || `I need guidance and assistance with ${this.bookingState.topic || this.bookingState.subject || 'this session'}.`;
 
       if (titleInput && !titleInput.value) {
-        titleInput.value = `Help with ${this.bookingState.topic || this.bookingState.subject || 'Programming'}`;
-        this.bookingState.title = titleInput.value;
+        titleInput.value = defaultTitle;
       }
-      if (descInput && !descInput.value && this.bookingState.subjectNotes) {
-        descInput.value = this.bookingState.subjectNotes;
-        this.bookingState.description = descInput.value;
+      this.bookingState.title = titleInput?.value?.trim() || defaultTitle;
+
+      if (descInput && !descInput.value) {
+        descInput.value = defaultDesc;
       }
+      this.bookingState.description = descInput?.value?.trim() || defaultDesc;
+
       if (platformSelect) {
         platformSelect.value = this.bookingState.meetingPlatform || 'Google Meet';
+      }
+      if (typeSelect) {
+        typeSelect.value = this.bookingState.sessionType || '1-on-1 Swap Session';
       }
       if (notesInput && !notesInput.value && this.bookingState.additionalNotes) {
         notesInput.value = this.bookingState.additionalNotes;
@@ -3516,9 +3543,9 @@
 
       const continueBtn = document.getElementById('btnContinueToReview');
       if (continueBtn) {
-        const title = titleInput?.value?.trim() || '';
-        const desc = descInput?.value?.trim() || '';
-        continueBtn.disabled = !(title.length >= 3 && desc.length >= 5);
+        continueBtn.disabled = false;
+        continueBtn.style.opacity = '1';
+        continueBtn.style.cursor = 'pointer';
       }
     },
 
