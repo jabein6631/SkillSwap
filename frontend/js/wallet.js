@@ -9,8 +9,8 @@ class SkillSwapStore {
     this.apiBase = '/api';
     this.storageKey = 'skillswap_vignan_store_v2';
     this.tokenKey = 'skillswap_auth_token';
-    this.token = localStorage.getItem(this.tokenKey) || localStorage.getItem('token') || localStorage.getItem('auth_token') || null;
-    this.currentPersonaId = localStorage.getItem('skillswap_active_persona') || null;
+    this.token = sessionStorage.getItem(this.tokenKey) || sessionStorage.getItem('token') || sessionStorage.getItem('auth_token') || null;
+    this.currentPersonaId = sessionStorage.getItem('skillswap_active_persona') || null;
     this.currentUser = null;
     this.personas = {};
     this.quizzes = [];
@@ -25,7 +25,7 @@ class SkillSwapStore {
       'Content-Type': 'application/json',
       ...customHeaders
     };
-    const activeToken = this.token || localStorage.getItem(this.tokenKey) || localStorage.getItem('token') || localStorage.getItem('auth_token');
+    const activeToken = this.token || sessionStorage.getItem(this.tokenKey) || sessionStorage.getItem('token') || sessionStorage.getItem('auth_token');
     if (activeToken) {
       headers['Authorization'] = `Bearer ${activeToken}`;
     }
@@ -37,27 +37,28 @@ class SkillSwapStore {
 
   async init() {
     try {
-      this.token = localStorage.getItem(this.tokenKey) || localStorage.getItem('token') || localStorage.getItem('auth_token') || null;
-      this.currentPersonaId = localStorage.getItem('skillswap_active_persona') || null;
+      // Clear legacy localStorage auth keys so new tabs start at Login page
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem('token');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('jwt');
+      localStorage.removeItem('skillswap_active_persona');
+      localStorage.removeItem('skillswap_logged_in');
+
+      this.token = sessionStorage.getItem(this.tokenKey) || sessionStorage.getItem('token') || sessionStorage.getItem('auth_token') || null;
+      this.currentPersonaId = sessionStorage.getItem('skillswap_active_persona') || null;
 
       if (this.token) {
         const isValid = await this.fetchMe();
         if (isValid && this.currentUser) {
           this.currentPersonaId = this.currentUser.id;
-          localStorage.setItem('skillswap_active_persona', this.currentUser.id);
+          sessionStorage.setItem('skillswap_active_persona', this.currentUser.id);
           sessionStorage.setItem('skillswap_logged_in', 'true');
-          localStorage.setItem('skillswap_logged_in', 'true');
         } else {
-          // Token is invalid because user account was deleted in database reset
-          this.setToken(null);
-          this.currentUser = null;
-          this.currentPersonaId = null;
-          this.personas = {};
-          localStorage.removeItem('skillswap_active_persona');
-          localStorage.removeItem('skillswap_vignan_store_v2');
-          sessionStorage.removeItem('skillswap_logged_in');
-          localStorage.removeItem('skillswap_logged_in');
+          this.logout();
         }
+      } else {
+        this.logout();
       }
 
       await Promise.all([
@@ -68,7 +69,7 @@ class SkillSwapStore {
         this.fetchCertificates()
       ]);
     } catch (e) {
-      console.warn('API fetch warning, using local state:', e);
+      console.warn('API fetch warning:', e);
     }
   }
 
@@ -91,9 +92,8 @@ class SkillSwapStore {
       ...(this.personas[data.user.id] || {}),
       ...data.user
     };
-    localStorage.setItem('skillswap_active_persona', data.user.id);
+    sessionStorage.setItem('skillswap_active_persona', data.user.id);
     sessionStorage.setItem('skillswap_logged_in', 'true');
-    localStorage.setItem('skillswap_logged_in', 'true');
     await this.fetchUsers();
     await this.fetchWallet();
     await this.fetchSessions();
@@ -119,9 +119,8 @@ class SkillSwapStore {
       ...(this.personas[data.user.id] || {}),
       ...data.user
     };
-    localStorage.setItem('skillswap_active_persona', data.user.id);
+    sessionStorage.setItem('skillswap_active_persona', data.user.id);
     sessionStorage.setItem('skillswap_logged_in', 'true');
-    localStorage.setItem('skillswap_logged_in', 'true');
     await this.fetchUsers();
     await this.fetchWallet();
     await this.fetchSessions();
@@ -145,6 +144,8 @@ class SkillSwapStore {
           ...(this.personas[data.user.id] || {}),
           ...data.user
         };
+        sessionStorage.setItem('skillswap_active_persona', data.user.id);
+        sessionStorage.setItem('skillswap_logged_in', 'true');
       }
     } catch (e) {
       console.warn('Auto-login persona note:', e.message);
@@ -192,11 +193,19 @@ class SkillSwapStore {
   setToken(token) {
     this.token = token;
     if (token) {
-      localStorage.setItem(this.tokenKey, token);
-      localStorage.setItem('token', token);
-      localStorage.setItem('auth_token', token);
-      localStorage.setItem('jwt', token);
+      sessionStorage.setItem(this.tokenKey, token);
+      sessionStorage.setItem('token', token);
+      sessionStorage.setItem('auth_token', token);
+      sessionStorage.setItem('jwt', token);
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem('token');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('jwt');
     } else {
+      sessionStorage.removeItem(this.tokenKey);
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('auth_token');
+      sessionStorage.removeItem('jwt');
       localStorage.removeItem(this.tokenKey);
       localStorage.removeItem('token');
       localStorage.removeItem('auth_token');
@@ -209,12 +218,10 @@ class SkillSwapStore {
     this.currentUser = null;
     this.currentPersonaId = null;
     this.personas = {};
+    sessionStorage.removeItem('skillswap_active_persona');
+    sessionStorage.removeItem('skillswap_logged_in');
     localStorage.removeItem('skillswap_active_persona');
     localStorage.removeItem('skillswap_vignan_store_v2');
-    localStorage.removeItem('skillswap_auth_token');
-    localStorage.removeItem('token');
-    localStorage.removeItem('auth_token');
-    sessionStorage.removeItem('skillswap_logged_in');
     localStorage.removeItem('skillswap_logged_in');
   }
 
@@ -222,8 +229,9 @@ class SkillSwapStore {
     if (!this.currentUser || !this.currentUser.id || this.currentUser.id === 'guest') {
       return false;
     }
-    const hasToken = Boolean(this.token || localStorage.getItem(this.tokenKey) || localStorage.getItem('token') || localStorage.getItem('auth_token'));
-    return hasToken;
+    const hasToken = Boolean(this.token || sessionStorage.getItem(this.tokenKey) || sessionStorage.getItem('token') || sessionStorage.getItem('auth_token'));
+    const hasLoginFlag = sessionStorage.getItem('skillswap_logged_in') === 'true';
+    return Boolean(hasToken && hasLoginFlag);
   }
 
   getCurrentPersona() {
