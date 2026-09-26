@@ -1109,9 +1109,14 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
     return `
       <div>
         <div style="margin-bottom: 1.5rem;">
-          <button class="codelab-back-btn" onclick="window.codelab.setStep(1)" style="margin-bottom: 0.75rem;">
-            <i class="fa-solid fa-arrow-left"></i> Back
-          </button>
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <button class="codelab-back-btn" onclick="window.codelab.setStep(1)">
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="window.codelab.setStep(3)" style="padding: 0.55rem 1.4rem; border-radius: var(--radius-full); font-weight: 800;">
+              Next <i class="fa-solid fa-arrow-right" style="margin-left: 0.35rem;"></i>
+            </button>
+          </div>
           <h3 class="codelab-section-title">2. Choose Difficulty</h3>
           <p class="codelab-section-desc">Select the difficulty level that matches your current skill level. You can change this anytime.</p>
         </div>
@@ -1144,15 +1149,6 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
               </div>
             `;
     }).join('')}
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 1.5rem;">
-          <button class="btn btn-secondary" onclick="window.codelab.setStep(1)" style="padding: 0.75rem 1.5rem; font-weight: 700;">
-            <i class="fa-solid fa-arrow-left" style="margin-right: 0.35rem;"></i> Back to Subjects
-          </button>
-          <button class="btn btn-primary" onclick="window.codelab.setStep(3)" style="padding: 0.75rem 2rem; font-weight: 800;">
-            Next <i class="fa-solid fa-arrow-right" style="margin-left: 0.35rem;"></i>
-          </button>
         </div>
       </div>
     `;
