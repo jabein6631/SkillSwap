@@ -148,6 +148,13 @@ const sessionController = {
 
       res.status(201).json(result);
     } catch (err) {
+      if (err.code === 'TUTOR_NOT_VERIFIED' || err.status === 403 || (err.message && err.message.toLowerCase().includes('verify'))) {
+        return res.status(403).json({
+          success: false,
+          error: 'TUTOR_NOT_VERIFIED',
+          message: 'Please verify your certificate before creating a Masterclass.'
+        });
+      }
       next(err);
     }
   },

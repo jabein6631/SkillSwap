@@ -472,7 +472,7 @@
         const url = document.getElementById('supabaseUrlInput').value.trim();
         const anonKey = document.getElementById('supabaseKeyInput').value.trim();
         try {
-          const res = await fetch('http://localhost:3000/api/database/config', {
+          const res = await fetch('/api/database/config', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url, anonKey })
@@ -1340,7 +1340,7 @@
           if (token) headers['Authorization'] = `Bearer ${token}`;
           if (current?.id) headers['x-user-id'] = current.id;
 
-          const res = await fetch('http://localhost:3000/api/certificates/upload', {
+          const res = await fetch('/api/certificates/upload', {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -2003,7 +2003,7 @@
           if (token) headers['Authorization'] = `Bearer ${token}`;
           if (current?.id) headers['x-user-id'] = current.id;
 
-          const res = await fetch('http://localhost:3000/api/certificates/upload', {
+          const res = await fetch('/api/certificates/upload', {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -2220,6 +2220,61 @@
       document.getElementById('prevJoinMasterclassBtn')?.addEventListener('click', () => {
         this.saveMasterclass('Confirmed');
       });
+    },
+
+    showTutorVerificationRequiredModal(msg) {
+      let modal = document.getElementById('tutorVerificationRequiredModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'tutorVerificationRequiredModal';
+        modal.className = 'modal-backdrop';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px);';
+        modal.innerHTML = `
+          <div style="background: #ffffff; width: 90%; max-width: 460px; border-radius: 16px; padding: 1.75rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); font-family: system-ui, -apple-system, sans-serif; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1rem;">
+              <div style="width: 48px; height: 48px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.35rem;">
+                <i class="fa-solid fa-award"></i>
+              </div>
+              <div>
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #0f172a;">Tutor Verification Required</h3>
+                <p style="margin: 0.15rem 0 0 0; font-size: 0.85rem; color: #64748b;">Verified Academic Certificate Needed</p>
+              </div>
+            </div>
+            
+            <p id="tutorVerificationModalMsg" style="color: #334155; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; background: #f8fafc; padding: 0.85rem 1rem; border-radius: 10px; border-left: 4px solid #2563eb;">
+              ${msg || 'You need a verified certificate to host a Masterclass.'}
+            </p>
+
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+              <button id="closeTutorVerificationModalBtn" style="padding: 0.65rem 1.25rem; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                Cancel
+              </button>
+              <button id="goToVerifyCertBtn" style="padding: 0.65rem 1.25rem; border-radius: 10px; border: none; background: #2563eb; color: #ffffff; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                <i class="fa-solid fa-file-shield"></i> Verify Certificate
+              </button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('closeTutorVerificationModalBtn')?.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+
+        document.getElementById('goToVerifyCertBtn')?.addEventListener('click', () => {
+          modal.style.display = 'none';
+          const uploadCertModal = document.getElementById('uploadCertModal');
+          if (uploadCertModal) {
+            this.openModal('uploadCertModal');
+          } else {
+            this.switchView('view-profile');
+          }
+        });
+      } else {
+        const msgEl = document.getElementById('tutorVerificationModalMsg');
+        if (msgEl) msgEl.textContent = msg || 'You need a verified certificate to host a Masterclass.';
+        modal.style.display = 'flex';
+      }
     },
 
     openCreateMasterclassPage(pushHistory = true, editSessionId = null) {
@@ -2699,6 +2754,10 @@
         });
 
         if (!res.ok) {
+          if (res.status === 403 || data.error === 'TUTOR_NOT_VERIFIED' || (data.message && data.message.toLowerCase().includes('verify'))) {
+            this.showTutorVerificationRequiredModal(data.message || 'You need a verified certificate to host a Masterclass.');
+            return;
+          }
           const serverErrMsg = data.error || data.message || 'Failed to create Masterclass';
           throw new Error(serverErrMsg);
         }
@@ -6259,7 +6318,7 @@
         if (token) headers['Authorization'] = `Bearer ${token}`;
         if (current?.id) headers['x-user-id'] = current.id;
 
-        const res = await fetch(`http://localhost:3000/api/certificates/status?userId=${encodeURIComponent(current?.id || 'sri')}`, { headers });
+        const res = await fetch(`/api/certificates/status?userId=${encodeURIComponent(current?.id || 'sri')}`, { headers });
         const data = await res.json();
 
         if (data.success) {
