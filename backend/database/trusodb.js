@@ -704,8 +704,12 @@ const dbProvider = {
   }) {
     const finalHours = Number(durationHours || duration || 1);
     const finalCapacity = Number(maxCapacity || maxParticipants || 30);
-    const tutor = await db.getAsync(`SELECT * FROM users WHERE id = ?`, [tutorId]);
-    if (!tutor) throw new Error('Tutor not found');
+    let tutor = await db.getAsync(`SELECT * FROM users WHERE id = ? OR LOWER(email) = ?`, [tutorId, String(tutorId).toLowerCase()]);
+    if (!tutor) {
+      tutor = { id: tutorId, email: tutorId };
+    }
+
+    const tutorEmail = (tutor?.email || String(tutorId)).toLowerCase();
 
     // Strict Backend Protection Rule: Check tutor's verified certificate status in DB
     let verifiedCert = await db.getAsync(
@@ -713,8 +717,19 @@ const dbProvider = {
        WHERE (user_id = ? OR LOWER(user_id) = ?) 
          AND (certificate_status = 'VERIFIED' OR is_verified = 1)
        LIMIT 1`,
-      [tutorId, (tutor?.email || tutorId).toLowerCase()]
+      [tutorId, tutorEmail]
     );
+
+    if (!verifiedCert && tutorEmail.includes('@')) {
+      verifiedCert = await db.getAsync(
+        `SELECT c.* FROM certificates c
+         JOIN users u ON (c.user_id = u.id OR LOWER(c.user_id) = LOWER(u.email))
+         WHERE LOWER(u.email) = ?
+           AND (c.certificate_status = 'VERIFIED' OR c.is_verified = 1)
+         LIMIT 1`,
+        [tutorEmail]
+      );
+    }
 
     if (!verifiedCert && (tutor.is_admin === 1 || tutor.is_verified === 1 || (tutor.badges_json && (tutor.badges_json.includes('Verified') || tutor.badges_json.includes('Tutor'))))) {
       verifiedCert = { id: 'cert_auto_' + tutorId, is_verified: 1 };
