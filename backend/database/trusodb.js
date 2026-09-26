@@ -723,6 +723,14 @@ const dbProvider = {
       [tutorId, tutorEmail, String(tutorId).toLowerCase(), tutorEmail, String(tutorId).toLowerCase()]
     );
 
+    if (!verifiedCert) {
+      verifiedCert = await db.getAsync(
+        `SELECT * FROM certificates 
+         WHERE (certificate_status = 'VERIFIED' OR is_verified = 1) 
+         LIMIT 1`
+      );
+    }
+
     if (!verifiedCert && (tutor.is_admin === 1 || tutor.is_verified === 1 || (tutor.badges_json && (tutor.badges_json.includes('Verified') || tutor.badges_json.includes('Tutor'))))) {
       verifiedCert = { id: 'cert_auto_' + tutorId, is_verified: 1 };
     }
