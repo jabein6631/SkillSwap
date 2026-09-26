@@ -1231,7 +1231,12 @@ const dbProvider = {
       [tutorIdStr, tutorIdStr.toLowerCase(), tutorIdStr.toLowerCase()]
     );
     if (!tutor) throw new Error(`Selected mentor was not found (tutorId: '${tutorIdStr}')`);
-    if (!tutor.is_verified) {
+    const cert = await db.getAsync(
+      `SELECT * FROM certificates WHERE user_id = ? AND (certificate_status = 'VERIFIED' OR (is_verified = 1 AND (tutor_eligible = 1 OR tutor_eligible IS NULL))) LIMIT 1`,
+      [tutor.id]
+    );
+    const isTutorEligible = Boolean(tutor.is_verified || cert);
+    if (!isTutorEligible) {
       throw new Error('This mentor has not passed certificate verification and is not eligible to take bookings.');
     }
 
