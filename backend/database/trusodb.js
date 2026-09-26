@@ -2417,6 +2417,8 @@ const dbProvider = {
   },
 
   async getUserSessionsCategorized(userId) {
+    await this.checkAndUpdateExpiredSessions();
+
     const targetUser = await db.getAsync(`SELECT * FROM users WHERE id = ? OR LOWER(email) = ?`, [userId, String(userId).toLowerCase()]);
     const userEmail = (targetUser?.email || '').toLowerCase();
 
@@ -2428,15 +2430,29 @@ const dbProvider = {
       if (r.session_id) reviewMap[r.session_id] = r;
     });
 
-    const enriched = allSessions.map(s => ({
-      ...s,
-      feedback: reviewMap[s.id] ? {
-        rating: reviewMap[s.id].rating,
-        comment: reviewMap[s.id].comment,
-        tags: JSON.parse(reviewMap[s.id].tags_json || '[]'),
-        reviewerName: reviewMap[s.id].reviewer_name
-      } : null
-    }));
+    const enriched = allSessions.map(s => {
+      const timing = this.getScheduledStartAndEndTimes(s);
+      let computedStatus = s.status || 'Confirmed';
+      if (computedStatus.toUpperCase() !== 'CANCELLED' && computedStatus.toUpperCase() !== 'DECLINED' && computedStatus.toUpperCase() !== 'PENDING') {
+        if (timing.isPastEnd) {
+          computedStatus = 'Completed';
+        } else if (timing.isStarted) {
+          computedStatus = 'Live';
+        }
+      }
+      return {
+        ...s,
+        computedStatus,
+        isStarted: timing.isStarted,
+        isPastEnd: timing.isPastEnd,
+        feedback: reviewMap[s.id] ? {
+          rating: reviewMap[s.id].rating,
+          comment: reviewMap[s.id].comment,
+          tags: JSON.parse(reviewMap[s.id].tags_json || '[]'),
+          reviewerName: reviewMap[s.id].reviewer_name
+        } : null
+      };
+    });
 
     const isUserMatch = (id) => {
       if (!id) return false;
@@ -2477,11 +2493,15 @@ const dbProvider = {
     const upcoming = userRelevant.filter(s => {
       if (!s.status) return false;
       const st = s.status.toUpperCase();
-      if (st === 'PENDING' || st === 'CANCELLED' || st === 'DECLINED') return false;
-      return (st === 'ACCEPTED' || st === 'CONFIRMED' || st === 'OPEN' || st === 'UPCOMING');
+      if (st === 'PENDING' || st === 'CANCELLED' || st === 'DECLINED' || st === 'COMPLETED' || st === 'ENDED') return false;
+      return !s.isPastEnd && (st === 'ACCEPTED' || st === 'CONFIRMED' || st === 'OPEN' || st === 'UPCOMING' || st === 'LIVE');
     });
 
-    const past = userRelevant.filter(s => s.status && (s.status.toLowerCase() === 'completed' || s.status.toLowerCase() === 'attendance_finalized'));
+    const past = userRelevant.filter(s => {
+      if (!s.status) return false;
+      const st = s.status.toLowerCase();
+      return st === 'completed' || st === 'ended' || st === 'attendance_finalized' || s.isPastEnd;
+    });
     const masterclasses = enriched.filter(s => isUserMatch(s.teacher_id) && s.session_type === 'GROUP_COHORT');
     const groups = enriched.filter(s => s.session_type === 'GROUP_COHORT' && s.status && s.status.toLowerCase() !== 'cancelled');
     const cancelled = userRelevant.filter(s => s.status && (s.status.toLowerCase() === 'cancelled' || s.status.toUpperCase() === 'CANCELLED' || s.status.toUpperCase() === 'DECLINED'));
@@ -3120,43 +3140,79 @@ const dbProvider = {
     }
   },
 
+  getScheduledStartAndEndTimes(session) {
+    if (!session) return { startTime: 0, endTime: 0, isStarted: false, isPastEnd: false };
+
+    let durationHours = 1.0;
+    if (session.hours != null) {
+      durationHours = Number(session.hours);
+    } else if (session.durationHours != null) {
+      durationHours = Number(session.durationHours);
+    } else if (session.duration != null) {
+      const dStr = String(session.duration).toLowerCase();
+      if (dStr.includes('min')) {
+        const num = parseFloat(dStr.replace('min', '').trim());
+        if (!isNaN(num)) durationHours = num / 60;
+      } else if (dStr.includes('hr')) {
+        const num = parseFloat(dStr.replace('hr', '').trim());
+        if (!isNaN(num)) durationHours = num;
+      } else {
+        const num = parseFloat(dStr);
+        if (!isNaN(num)) durationHours = num;
+      }
+    }
+    if (isNaN(durationHours) || durationHours <= 0) durationHours = 1.0;
+
+    const dateStr = session.date || session.session_date || new Date().toISOString().split('T')[0];
+    const timeStr = session.time || session.start_time || '08:00 PM';
+
+    let formattedDate = dateStr;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(formattedDate)) {
+      const dObj = new Date(formattedDate);
+      if (!isNaN(dObj.getTime())) {
+        formattedDate = dObj.toISOString().split('T')[0];
+      }
+    }
+
+    let hours = 20, minutes = 0;
+    const tMatch = String(timeStr).match(/^(\d{1,2}):?(\d{2})?\s*(AM|PM)?$/i);
+    if (tMatch) {
+      hours = parseInt(tMatch[1], 10);
+      minutes = tMatch[2] ? parseInt(tMatch[2], 10) : 0;
+      const ampm = tMatch[3] ? tMatch[3].toUpperCase() : null;
+      if (ampm === 'PM' && hours < 12) hours += 12;
+      if (ampm === 'AM' && hours === 12) hours = 0;
+    }
+
+    const pad = (n) => String(n).padStart(2, '0');
+    let startMs = new Date(`${formattedDate}T${pad(hours)}:${pad(minutes)}:00`).getTime();
+    if (isNaN(startMs)) {
+      startMs = session.created_at ? new Date(session.created_at).getTime() : Date.now() - 3600000;
+    }
+
+    const endMs = startMs + (durationHours * 3600000);
+    const nowMs = Date.now();
+
+    return {
+      startTime: startMs,
+      endTime: endMs,
+      isStarted: nowMs >= startMs,
+      isPastEnd: nowMs >= endMs
+    };
+  },
+
   isSessionExpired(session) {
     if (!session) return false;
     const st = (session.status || '').toUpperCase();
     if (st === 'ENDED' || st === 'COMPLETED' || st === 'CANCELLED' || st === 'DECLINED') {
       return true;
     }
-
-    const durationHours = Number(session.hours || session.durationHours || session.duration || 1.0);
-    const durationMs = durationHours * 60 * 60 * 1000;
-    const now = Date.now();
-
-    // 1. If meeting_started_at exists, calculate end time from actual start
-    if (session.meeting_started_at) {
-      const startStr = String(session.meeting_started_at);
-      const normalizedStart = (startStr.endsWith('Z') || startStr.includes('+'))
-        ? startStr
-        : startStr.replace(' ', 'T') + (startStr.includes('T') ? 'Z' : 'Z');
-      const startTime = new Date(normalizedStart).getTime();
-      if (!isNaN(startTime)) {
-        const scheduledEnd = startTime + durationMs;
-        if (now >= scheduledEnd) {
-          return true;
-        }
-        return false;
-      }
-    }
-
-    // 2. If session is LIVE or CONFIRMED and hasn't started yet, keep it open
-    if (st === 'LIVE' || st === 'CONFIRMED' || st === 'OPEN') {
-      return false;
-    }
-
-    return false;
+    const timing = this.getScheduledStartAndEndTimes(session);
+    return timing.isPastEnd;
   },
 
   /**
-   * Scan active sessions and atomically update expired sessions to ENDED status
+   * Scan active sessions and atomically update expired sessions to Completed status
    */
   async checkAndUpdateExpiredSessions() {
     try {
@@ -3167,7 +3223,7 @@ const dbProvider = {
       for (const s of candidateSessions) {
         if (this.isSessionExpired(s)) {
           await db.runAsync(
-            `UPDATE sessions SET status = 'ENDED', meeting_ended_at = COALESCE(meeting_ended_at, CURRENT_TIMESTAMP) WHERE id = ?`,
+            `UPDATE sessions SET status = 'Completed', meeting_ended_at = COALESCE(meeting_ended_at, CURRENT_TIMESTAMP) WHERE id = ?`,
             [s.id]
           );
           expiredSessionIds.push(s.id);

@@ -7756,6 +7756,62 @@
       }
     },
 
+    renderCompletedMiniCardHtml(sess) {
+      if (!sess) return '';
+      const topic = sess.topic || sess.title || sess.skill || '1-on-1 Swap Session';
+      const teacherName = sess.teacherName || sess.teacher?.name || 'Tutor';
+      const dateStr = sess.date || 'Recently';
+      const timeStr = sess.time || '';
+      
+      return `
+        <div class="mini-completed-card" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-subtle, #e2e8f0); border-radius: var(--radius-md, 8px); margin-bottom: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(16, 185, 129, 0.12); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+              <h5 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.15rem 0;">${topic}</h5>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);">Hosted by ${teacherName} • ${dateStr} ${timeStr}</div>
+            </div>
+          </div>
+          <span style="font-size: 0.72rem; background: #dcfce7; color: #166534; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700;">
+            Completed ✓
+          </span>
+        </div>
+      `;
+    },
+
+    renderPopularGroupMiniCardHtml(sess, currentPersona) {
+      if (!sess) return '';
+      const topic = sess.topic || sess.title || sess.skill || 'Group Masterclass';
+      const teacherName = sess.teacherName || 'Host Tutor';
+      let monthStr = 'SEP';
+      let dayStr = '26';
+      if (sess.date) {
+        const parts = sess.date.split('-');
+        if (parts.length === 3) {
+          const mNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+          monthStr = mNames[parseInt(parts[1], 10) - 1] || 'SEP';
+          dayStr = parts[2];
+        }
+      }
+      return `
+        <div class="mini-group-card" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; background: #ffffff; border: 1px solid rgba(99, 102, 241, 0.15); border-radius: var(--radius-md, 8px); margin-bottom: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 42px; height: 42px; border-radius: 8px; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800;">
+              <span style="font-size: 0.65rem; text-transform: uppercase; line-height: 1;">${monthStr}</span>
+              <span style="font-size: 0.95rem; line-height: 1;">${dayStr}</span>
+            </div>
+            <div>
+              <h5 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.15rem 0;">${topic}</h5>
+              <div style="font-size: 0.78rem; color: #059669; font-weight: 700;"><i class="fa-solid fa-gift"></i> FREE TO JOIN <span style="color: var(--text-secondary); font-weight: 400;">• Hosted by: ${teacherName}</span></div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.openSessionDetailsModal('${sess.id}')" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">Join</button>
+        </div>
+      `;
+    },
+
     renderSessionRowCardHtml(sess, currentPersona) {
       const isCohort = sess.session_type === 'GROUP_COHORT';
       const isHost = sess.teacher_id === currentPersona.id;
