@@ -4,6 +4,10 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { initSchema } = require('../backend/database/db');
+
+// Ensure database schema tables (including signals table) exist on serverless startup
+initSchema().catch(err => console.warn('Schema init notice:', err.message));
 
 const app = express();
 
