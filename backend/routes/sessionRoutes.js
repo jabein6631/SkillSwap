@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const sessionController = require('../controllers/sessionController');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, optionalAuth } = require('../middleware/auth');
 
-// All session routes strictly require authentication
+// Public / Optionally Authenticated routes
+router.get('/', optionalAuth, sessionController.getSessions);
+
+// All other session routes strictly require authentication
 router.use(authenticateToken);
-
-router.get('/', sessionController.getSessions);
 router.get('/my', sessionController.getMySessions);
 router.get('/my-sessions', sessionController.getMySessions);
 router.post('/', sessionController.bookSession);
