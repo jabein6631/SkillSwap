@@ -1224,11 +1224,13 @@ const dbProvider = {
       ? (tutorId.id || tutorId.user_id || tutorId.email || tutorId.name || '')
       : String(tutorId || '').trim();
 
+    console.log('[DEBUG bookSessionEscrow] Raw tutorId:', tutorId, 'Extracted tutorIdStr:', tutorIdStr);
+
     let tutor = await db.getAsync(
       `SELECT * FROM users WHERE id = ? OR LOWER(name) = ? OR LOWER(email) = ?`,
       [tutorIdStr, tutorIdStr.toLowerCase(), tutorIdStr.toLowerCase()]
     );
-    if (!tutor) throw new Error('Selected mentor was not found');
+    if (!tutor) throw new Error(`Selected mentor was not found (tutorId: '${tutorIdStr}')`);
     if (!tutor.is_verified) {
       throw new Error('This mentor has not passed certificate verification and is not eligible to take bookings.');
     }
