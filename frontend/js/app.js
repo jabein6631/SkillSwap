@@ -12062,11 +12062,15 @@
       }
 
       if (this.timerSeconds <= 0) {
-        if (display) display.textContent = '00:00:00 SESSION ENDED';
-        if (window.skillSwapConference && window.skillSwapConference.handleRemoteSessionEnded) {
-          window.skillSwapConference.handleRemoteSessionEnded('The scheduled session time has expired.');
+        if (session && (session.status === 'LIVE' || session.status === 'IN_PROGRESS' || session.session_type === 'GROUP_COHORT')) {
+          this.timerSeconds = Math.round((Number(session.hours) || 1) * 3600);
+        } else {
+          if (display) display.textContent = '00:00:00 SESSION ENDED';
+          if (window.skillSwapConference && window.skillSwapConference.handleRemoteSessionEnded) {
+            window.skillSwapConference.handleRemoteSessionEnded('The scheduled session time has expired.');
+          }
+          return;
         }
-        return;
       }
 
       const updateDisplay = () => {

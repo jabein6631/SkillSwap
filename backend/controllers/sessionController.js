@@ -387,7 +387,7 @@ const sessionController = {
       // Record live attendance for participants entering the room
       if (isTeacher) {
         await db.runAsync(
-          `UPDATE sessions SET teacher_joined_at = COALESCE(teacher_joined_at, CURRENT_TIMESTAMP), meeting_started_at = COALESCE(meeting_started_at, CURRENT_TIMESTAMP), status = 'LIVE' WHERE id = ?`,
+          `UPDATE sessions SET teacher_joined_at = COALESCE(teacher_joined_at, CURRENT_TIMESTAMP), meeting_started_at = CURRENT_TIMESTAMP, status = 'LIVE' WHERE id = ?`,
           [id]
         );
       }
@@ -903,13 +903,19 @@ const sessionController = {
         }
       }
 
-      const remainingMs = Math.max(0, scheduledEndMs - Date.now());
-      const remainingSeconds = Math.floor(remainingMs / 1000);
+      let remainingMs = Math.max(0, scheduledEndMs - Date.now());
+      let remainingSeconds = Math.floor(remainingMs / 1000);
+
+      // If status is LIVE or IN_PROGRESS, treat as active for attendees
+      const isActiveSession = session.status === 'LIVE' || session.status === 'IN_PROGRESS';
+      if (isActiveSession && remainingSeconds <= 0) {
+        remainingSeconds = Math.floor(durationMs / 1000);
+      }
 
       res.json({
         success: true,
-        isEnded: remainingSeconds <= 0,
-        status: remainingSeconds <= 0 ? 'ENDED' : session.status,
+        isEnded: isActiveSession ? false : remainingSeconds <= 0,
+        status: (remainingSeconds <= 0 && !isActiveSession) ? 'ENDED' : session.status,
         remainingSeconds
       });
     } catch (err) {
