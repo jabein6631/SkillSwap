@@ -359,7 +359,13 @@ class SkillSwapConference {
 
   startSignalingPolling() {
     if (this.signalingInterval) clearInterval(this.signalingInterval);
-    this.lastSignalTime = Date.now() - 5000;
+    this.lastSignalTime = Date.now() - 30000;
+
+    // Immediately announce presence to room via HTTP signal POST
+    this.sendSignalingMessage({
+      type: 'peer-joined',
+      userProfile: this.currentUserProfile
+    });
 
     this.signalingInterval = setInterval(async () => {
       if (!this.isInCall || !this.sessionId) {
@@ -390,6 +396,7 @@ class SkillSwapConference {
    */
   async handleSignalingMessage(msg) {
     const { type, peerId, senderPeerId, targetPeerId, userProfile, sdp, candidate, peers, mediaState, emoji, text, senderName } = msg;
+    const remoteId = senderPeerId || peerId;
 
     switch (type) {
       case 'support-update': {
@@ -400,57 +407,54 @@ class SkillSwapConference {
       }
 
       case 'room-joined': {
-        // Store existing peers in the room
         if (peers && Array.isArray(peers)) {
           for (const p of peers) {
             if (p.peerId !== this.peerId) {
               this.remoteUsers.set(p.peerId, p.userProfile);
-              // As a safety net, if the existing peer does not initiate an offer within 1 second, initiate connection
               setTimeout(async () => {
                 if (!this.peerConnections.has(p.peerId)) {
-                  console.log(`⚡ Initiating fallback connection to existing peer: ${p.peerId}`);
+                  console.log(`⚡ Initiating connection to existing peer: ${p.peerId}`);
                   await this.createPeerConnection(p.peerId, true, p.userProfile);
                 }
-              }, 1200);
+              }, 800);
             }
           }
           this.updateParticipantCount();
-          if (this.remoteUsers.size > 0 && window.app && this.currentSessionData) {
-            // Both are now present!
-            window.app.startSessionTimer(this.currentSessionData);
-          }
         }
         break;
       }
 
       case 'peer-joined': {
-        if (peerId && peerId !== this.peerId) {
-          console.log(`👤 Peer Joined Meeting: ${userProfile?.name || peerId}`);
-          this.remoteUsers.set(peerId, userProfile);
+        if (remoteId && remoteId !== this.peerId) {
+          console.log(`👤 Peer Joined Meeting: ${userProfile?.name || remoteId}`);
+          this.remoteUsers.set(remoteId, userProfile);
+          this.updateParticipantCount();
           if (window.app?.showToast) {
             window.app.showToast(`👋 ${userProfile?.name || 'Peer'} joined the live meeting!`, 'user');
           }
-          // Both are now present!
           if (window.app && this.currentSessionData) {
             window.app.startSessionTimer(this.currentSessionData);
           }
-          // The peer who was already in the room creates an offer to the newly joined peer
-          await this.createPeerConnection(peerId, true, userProfile);
+          // Existing or newly joined peer creates WebRTC connection & offer
+          if (!this.peerConnections.has(remoteId)) {
+            await this.createPeerConnection(remoteId, true, userProfile);
+          }
         }
         break;
       }
 
       case 'offer': {
-        if (senderPeerId && senderPeerId !== this.peerId) {
-          console.log(`📩 Received SDP Offer from ${senderPeerId}`);
-          if (userProfile) this.remoteUsers.set(senderPeerId, userProfile);
-          const pc = await this.createPeerConnection(senderPeerId, false, userProfile);
+        if (remoteId && remoteId !== this.peerId) {
+          console.log(`📩 Received SDP Offer from ${remoteId}`);
+          if (userProfile) this.remoteUsers.set(remoteId, userProfile);
+          this.updateParticipantCount();
+          const pc = await this.createPeerConnection(remoteId, false, userProfile);
           await pc.setRemoteDescription(new RTCSessionDescription(sdp));
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
           this.sendSignalingMessage({
             type: 'answer',
-            targetPeerId: senderPeerId,
+            targetPeerId: remoteId,
             sdp: pc.localDescription
           });
         }
