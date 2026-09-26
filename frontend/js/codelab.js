@@ -1338,6 +1338,11 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
             <h3 class="codelab-section-title">3. Start Solving</h3>
             <p class="codelab-section-desc">Choose a problem and start practicing. Solve coding or conceptual problems to improve your skills.</p>
           </div>
+          <div>
+            <button class="codelab-back-btn" onclick="window.codelab.setStep(2)">
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+          </div>
         </div>
 
         <!-- Filter Pills Bar & Sort Dropdown -->
