@@ -1227,20 +1227,19 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
             <h3 class="codelab-section-title">1. Select a Subject</h3>
             <p class="codelab-section-desc">Choose the subject you want to practice.</p>
           </div>
-          <div class="codelab-search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="codelab-search-input" placeholder="Search subjects..." oninput="window.codelab.searchSubjects(this.value)">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="codelab-search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" class="codelab-search-input" placeholder="Search subjects..." oninput="window.codelab.searchSubjects(this.value)">
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="window.codelab.setStep(2)" style="padding: 0.55rem 1.4rem; border-radius: var(--radius-full); font-weight: 800; white-space: nowrap;">
+              Next <i class="fa-solid fa-arrow-right" style="margin-left: 0.35rem;"></i>
+            </button>
           </div>
         </div>
 
         <div class="codelab-subjects-grid" id="codelabSubjectsGrid">
           ${this.renderSubjectsCardsHtml()}
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
-          <button class="btn btn-primary" style="padding: 0.75rem 2rem; border-radius: var(--radius-md); font-weight: 800;" onclick="window.codelab.setStep(2)">
-            Next <i class="fa-solid fa-arrow-right" style="margin-left: 0.35rem;"></i>
-          </button>
         </div>
       </div>
     `;
