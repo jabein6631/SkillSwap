@@ -208,16 +208,22 @@ class SkillSwapStore {
     this.setToken(null);
     this.currentUser = null;
     this.currentPersonaId = null;
+    this.personas = {};
     localStorage.removeItem('skillswap_active_persona');
+    localStorage.removeItem('skillswap_vignan_store_v2');
+    localStorage.removeItem('skillswap_auth_token');
+    localStorage.removeItem('token');
+    localStorage.removeItem('auth_token');
     sessionStorage.removeItem('skillswap_logged_in');
     localStorage.removeItem('skillswap_logged_in');
   }
 
   isSessionActive() {
+    if (!this.currentUser || !this.currentUser.id || this.currentUser.id === 'guest') {
+      return false;
+    }
     const hasToken = Boolean(this.token || localStorage.getItem(this.tokenKey) || localStorage.getItem('token') || localStorage.getItem('auth_token'));
-    const hasLoginFlag = sessionStorage.getItem('skillswap_logged_in') === 'true' || localStorage.getItem('skillswap_logged_in') === 'true';
-    const hasPersona = Boolean(localStorage.getItem('skillswap_active_persona') || (this.currentUser && this.currentUser.id !== 'guest'));
-    return Boolean(hasToken || hasLoginFlag || (hasPersona && (this.currentPersonaId && this.currentPersonaId !== 'guest')));
+    return hasToken;
   }
 
   getCurrentPersona() {
