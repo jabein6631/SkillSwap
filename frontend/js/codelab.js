@@ -122,12 +122,10 @@ You can return the answer in any order.`,
           'A really brute force way would be to search for all possible pairs of numbers but that would be slow (O(N^2)).',
           'Can we use extra space? We can use a Hash Map to look up the complement in O(1) time.'
         ],
-        starterCode: {
-          python3: `# Write your solution here\nclass Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        # Your code here\n        seen = {}\n        for i, n in enumerate(nums):\n            diff = target - n\n            if diff in seen:\n                return [seen[diff], i]\n            seen[n] = i\n        return []`,
-          javascript: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const diff = target - nums[i];\n        if (map.has(diff)) {\n            return [map.get(diff), i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n}`,
-          java: `import java.util.HashMap;\n\nclass Solution {\n    public int[] twoSum(int[] nums, int target) {\n        HashMap<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int diff = target - nums[i];\n            if (map.containsKey(diff)) {\n                return new int[] { map.get(diff), i };\n            }\n            map.put(nums[i], i);\n        }\n        return new int[]{};\n    }\n}`,
-          cpp: `#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        unordered_map<int, int> map;\n        for (int i = 0; i < nums.size(); i++) {\n            int diff = target - nums[i];\n            if (map.find(diff) != map.end()) {\n                return {map[diff], i};\n            }\n            map[nums[i]] = i;\n        }\n        return {};\n    }\n};`
+        referenceSolution: {
+          python3: `class Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        seen = {}\n        for i, n in enumerate(nums):\n            diff = target - n\n            if diff in seen:\n                return [seen[diff], i]\n            seen[n] = i\n        return []`
         },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
           { input: 'nums = [2, 7, 11, 15]\ntarget = 9', expected: '[0, 1]' },
           { input: 'nums = [3, 2, 4]\ntarget = 6', expected: '[1, 2]' },
@@ -167,12 +165,10 @@ You must do this by modifying the input array in-place with <code>O(1)</code> ex
         hints: [
           'The entire logic is based on using two pointers: one at the start, one at the end.'
         ],
-        starterCode: {
-          python3: `# Write your solution here\nclass Solution:\n    def reverseString(self, s: list[str]) -> None:\n        """\n        Do not return anything, modify s in-place instead.\n        """\n        left, right = 0, len(s) - 1\n        while left < right:\n            s[left], s[right] = s[right], s[left]\n            left += 1\n            right -= 1`,
-          javascript: `function reverseString(s) {\n    let left = 0, right = s.length - 1;\n    while (left < right) {\n        [s[left], s[right]] = [s[right], s[left]];\n        left++;\n        right--;\n    }\n}`,
-          java: `class Solution {\n    public void reverseString(char[] s) {\n        int left = 0, right = s.length - 1;\n        while (left < right) {\n            char temp = s[left];\n            s[left++] = s[right];\n            s[right--] = temp;\n        }\n    }\n}`,
-          cpp: `#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    void reverseString(vector<char>& s) {\n        int left = 0, right = s.size() - 1;\n        while (left < right) {\n            swap(s[left++], s[right--]);\n        }\n    }\n};`
+        referenceSolution: {
+          python3: `class Solution:\n    def reverseString(self, s: list[str]) -> None:\n        left, right = 0, len(s) - 1\n        while left < right:\n            s[left], s[right] = s[right], s[left]\n            left += 1\n            right -= 1`
         },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
           { input: 's = ["h","e","l","l","o"]', expected: '["o","l","l","e","h"]' },
           { input: 's = ["H","a","n","n","a","h"]', expected: '["h","a","n","n","a","H"]' }
@@ -204,12 +200,10 @@ Analyze stack operations, real-world examples (call stack, undo operations, brow
         hints: [
           'Think of a stack of plates in a cafeteria: the plate placed last is taken first.'
         ],
-        starterCode: {
-          python3: `# Conceptual Problem\n# Answer the prompt or implement a simple Stack class:\nclass Stack:\n    def __init__(self):\n        self.items = []\n    def push(self, item):\n        self.items.append(item)\n    def pop(self):\n        return self.items.pop() if self.items else None\n    def peek(self):\n        return self.items[-1] if self.items else None`,
-          javascript: `class Stack {\n    constructor() {\n        this.items = [];\n    }\n    push(item) { this.items.push(item); }\n    pop() { return this.items.pop(); }\n    peek() { return this.items[this.items.length - 1]; }\n}`,
-          java: `import java.util.Stack;\n\nclass Solution {\n    // A Stack follows LIFO principle\n}`,
-          cpp: `#include <stack>\nusing namespace std;\n\n// std::stack follows LIFO`
+        referenceSolution: {
+          python3: `class Stack:\n    def __init__(self):\n        self.items = []\n    def push(self, item):\n        self.items.append(item)\n    def pop(self):\n        return self.items.pop() if self.items else None`
         },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
           { input: 'stack = Stack()\nstack.push(10)\nstack.push(20)\nstack.pop()', expected: '20' }
         ]
@@ -241,12 +235,10 @@ An input string is valid if:
         hints: [
           'Use a stack to track open brackets and match them with incoming closing brackets.'
         ],
-        starterCode: {
-          python3: `# Write your solution here\nclass Solution:\n    def isValid(self, s: str) -> bool:\n        stack = []\n        mapping = {")": "(", "}": "{", "]": "["}\n        for char in s:\n            if char in mapping:\n                top = stack.pop() if stack else '#'\n                if mapping[char] != top:\n                    return False\n            else:\n                stack.append(char)\n        return not stack`,
-          javascript: `function isValid(s) {\n    const stack = [];\n    const map = { ')': '(', '}': '{', ']': '[' };\n    for (const char of s) {\n        if (map[char]) {\n            if (stack.pop() !== map[char]) return false;\n        } else {\n            stack.push(char);\n        }\n    }\n    return stack.length === 0;\n}`,
-          java: `import java.util.Stack;\n\nclass Solution {\n    public boolean isValid(String s) {\n        Stack<Character> stack = new Stack<>();\n        for (char c : s.toCharArray()) {\n            if (c == '(') stack.push(')');\n            else if (c == '{') stack.push('}');\n            else if (c == '[') stack.push(']');\n            else if (stack.isEmpty() || stack.pop() != c) return false;\n        }\n        return stack.isEmpty();\n    }\n}`,
-          cpp: `#include <string>\n#include <stack>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isValid(string s) {\n        stack<char> st;\n        for (char c : s) {\n            if (c == '(') st.push(')');\n            else if (c == '{') st.push('}');\n            else if (c == '[') st.push(']');\n            else {\n                if (st.empty() || st.top() != c) return false;\n                st.pop();\n            }\n        }\n        return st.empty();\n    }\n};`
+        referenceSolution: {
+          python3: `class Solution:\n    def isValid(self, s: str) -> bool:\n        stack = []\n        mapping = {")": "(", "}": "{", "]": "["}\n        for char in s:\n            if char in mapping:\n                top = stack.pop() if stack else "#"\n                if mapping[char] != top:\n                    return False\n            else:\n                stack.append(char)\n        return not stack`
         },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
           { input: 's = "()"', expected: 'true' },
           { input: 's = "()[]{}"', expected: 'true' },
@@ -275,12 +267,10 @@ Explain the halving principle: each iteration divides the search space into half
         hints: [
           'Binary search repeatedly halves the search space.'
         ],
-        starterCode: {
-          python3: `# Concept: Binary Search Time Complexity\n# Worst Case: O(log N)\n# Best Case: O(1) (target is middle element)\n# Space Complexity: O(1) iterative, O(log N) recursive`,
-          javascript: `// Binary Search Complexity\n// Time: O(log N)\n// Space: O(1)`,
-          java: `// Binary Search Complexity\n// O(log N)`,
-          cpp: `// Binary Search Complexity\n// O(log N)`
+        referenceSolution: {
+          python3: `def binarySearchTimeComplexity(n):\n    return "O(log N)"`
         },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
           { input: 'Array length = 1024', expected: 'log2(1024) = 10 comparisons' }
         ]
@@ -311,12 +301,10 @@ Merge <code>nums2</code> into <code>nums1</code> as one sorted array.`,
         hints: [
           'Start filling nums1 from the back to avoid overwriting elements.'
         ],
-        starterCode: {
-          python3: `# Write your solution here\nclass Solution:\n    def merge(self, nums1: list[int], m: int, nums2: list[int], n: int) -> None:\n        p1, p2, p = m - 1, n - 1, m + n - 1\n        while p2 >= 0:\n            if p1 >= 0 and nums1[p1] > nums2[p2]:\n                nums1[p] = nums1[p1]\n                p1 -= 1\n            else:\n                nums1[p] = nums2[p2]\n                p2 -= 1\n            p -= 1`,
-          javascript: `function merge(nums1, m, nums2, n) {\n    let p1 = m - 1, p2 = n - 1, p = m + n - 1;\n    while (p2 >= 0) {\n        if (p1 >= 0 && nums1[p1] > nums2[p2]) {\n            nums1[p--] = nums1[p1--];\n        } else {\n            nums1[p--] = nums2[p2--];\n        }\n    }\n}`,
-          java: `class Solution {\n    public void merge(int[] nums1, int m, int[] nums2, int n) {\n        int p1 = m - 1, p2 = n - 1, p = m + n - 1;\n        while (p2 >= 0) {\n            if (p1 >= 0 && nums1[p1] > nums2[p2]) nums1[p--] = nums1[p1--];\n            else nums1[p--] = nums2[p2--];\n        }\n    }\n}`,
-          cpp: `#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {\n        int p1 = m - 1, p2 = n - 1, p = m + n - 1;\n        while (p2 >= 0) {\n            if (p1 >= 0 && nums1[p1] > nums2[p2]) nums1[p--] = nums1[p1--];\n            else nums1[p--] = nums2[p2--];\n        }\n    }\n};`
+        referenceSolution: {
+          python3: `class Solution:\n    def merge(self, nums1: list[int], m: int, nums2: list[int], n: int) -> None:\n        p1, p2, p = m - 1, n - 1, m + n - 1\n        while p2 >= 0:\n            if p1 >= 0 and nums1[p1] > nums2[p2]:\n                nums1[p] = nums1[p1]\n                p1 -= 1\n            else:\n                nums1[p] = nums2[p2]\n                p2 -= 1\n            p -= 1`
         },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
           { input: 'nums1 = [1,2,3,0,0,0], m = 3\nnums2 = [2,5,6], n = 3', expected: '[1,2,2,3,5,6]' }
         ]
@@ -362,10 +350,15 @@ Merge <code>nums2</code> into <code>nums1</code> as one sorted array.`,
   openProblem(problemId) {
     this.currentProblemId = problemId;
     this.currentStep = 4; // IDE
+    this.selectedLanguage = 'python3';
     this.activeIdeTab = 'description';
     this.activeRightTab = 'testcases';
     this.activeTestCaseIndex = 0;
     this.render();
+    const editor = document.getElementById('codelabCodeEditor');
+    if (editor) {
+      editor.value = '';
+    }
     this.updateLineNumbers();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -378,23 +371,17 @@ Merge <code>nums2</code> into <code>nums1</code> as one sorted array.`,
   }
 
   setLanguage(lang) {
-    this.selectedLanguage = lang;
-    const prob = this.problems.find(p => p.id === this.currentProblemId) || this.problems[0];
-    const editor = document.getElementById('codelabCodeEditor');
-    if (editor && prob.starterCode[lang]) {
-      editor.value = prob.starterCode[lang];
-      this.updateLineNumbers();
-    }
+    this.selectedLanguage = 'python3';
+    this.updateLineNumbers();
   }
 
   resetCode() {
-    const prob = this.problems.find(p => p.id === this.currentProblemId) || this.problems[0];
     const editor = document.getElementById('codelabCodeEditor');
-    if (editor && prob.starterCode[this.selectedLanguage]) {
-      editor.value = prob.starterCode[this.selectedLanguage];
+    if (editor) {
+      editor.value = '';
       this.updateLineNumbers();
       if (window.app && window.app.showToast) {
-        window.app.showToast('Code editor reset to default template', 'arrow-rotate-right');
+        window.app.showToast('Code editor cleared', 'rotate-left');
       }
     }
   }
@@ -470,16 +457,324 @@ Merge <code>nums2</code> into <code>nums1</code> as one sorted array.`,
     const editor = document.getElementById('codelabCodeEditor');
     const numEl = document.getElementById('codelabLineNumbers');
     if (!editor || !numEl) return;
-    const lineCount = editor.value.split('\n').length;
+    const lineCount = editor.value ? editor.value.split('\n').length : 1;
     numEl.innerHTML = Array.from({ length: Math.max(lineCount, 15) }, (_, i) => i + 1).join('<br>');
   }
 
+  executePython3(codeStr, testCase, problemId) {
+    if (!codeStr || !codeStr.trim()) {
+      return { status: 'EMPTY', message: 'Please write your solution first.' };
+    }
+
+    try {
+      const jsCode = this.transpilePython3ToJS(codeStr);
+      return this.evaluateTranspiledJS(jsCode, testCase, problemId);
+    } catch (err) {
+      let errorMsg = err.message || String(err);
+      if (err instanceof SyntaxError || errorMsg.toLowerCase().includes('syntaxerror') || errorMsg.includes('expected')) {
+        if (!errorMsg.startsWith('SyntaxError')) {
+          errorMsg = 'SyntaxError: ' + errorMsg;
+        }
+      } else if (err instanceof ReferenceError || errorMsg.includes('ReferenceError') || errorMsg.includes('is not defined')) {
+        const varName = errorMsg.split(' ')[0] || 'variable';
+        errorMsg = `NameError: name '${varName.replace(/['"]/g, '')}' is not defined`;
+      }
+      return {
+        status: 'RUNTIME_ERROR',
+        output: errorMsg
+      };
+    }
+  }
+
+  transpilePython3ToJS(pyCode) {
+    const lines = pyCode.split('\n');
+
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      
+      const matchControl = trimmed.match(/^(if|elif|else|for|while|def|class|try|except|finally|with)\b(.*)$/);
+      if (matchControl) {
+        const rest = matchControl[2].split('#')[0].trim();
+        if (!rest.endsWith(':')) {
+          throw new SyntaxError(`expected ':' at line ${i + 1}`);
+        }
+      }
+    }
+
+    let paren = 0, bracket = 0, brace = 0;
+    for (let char of pyCode) {
+      if (char === '(') paren++;
+      if (char === ')') paren--;
+      if (char === '[') bracket++;
+      if (char === ']') bracket--;
+      if (char === '{') brace++;
+      if (char === '}') brace--;
+    }
+    if (paren !== 0 || bracket !== 0 || brace !== 0) {
+      throw new SyntaxError('unbalanced brackets or parentheses');
+    }
+
+    const indentStack = [0];
+    const outLines = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const rawLine = lines[i];
+      const commentIdx = rawLine.indexOf('#');
+      let lineNoComment = commentIdx >= 0 ? rawLine.slice(0, commentIdx) : rawLine;
+      
+      if (!lineNoComment.trim()) continue;
+
+      const indent = rawLine.search(/\S/);
+      const currentIndent = indentStack[indentStack.length - 1];
+
+      if (indent > currentIndent) {
+        indentStack.push(indent);
+        if (outLines.length > 0) {
+          outLines[outLines.length - 1] += ' {';
+        }
+      } else if (indent < currentIndent) {
+        while (indentStack.length > 1 && indentStack[indentStack.length - 1] > indent) {
+          indentStack.pop();
+          outLines.push('}');
+        }
+      }
+
+      let codeLine = lineNoComment.trim();
+
+      codeLine = codeLine.replace(/->\s*[^:]+:/, ':');
+      codeLine = codeLine.replace(/:\s*[^,):=]+/g, '');
+
+      if (codeLine.startsWith('class ')) {
+        const className = codeLine.replace('class ', '').replace(':', '').trim();
+        outLines.push(`class ${className}`);
+        continue;
+      }
+
+      if (codeLine.startsWith('def ')) {
+        let defContent = codeLine.replace('def ', '').replace(':', '').trim();
+        const firstParen = defContent.indexOf('(');
+        const funcName = defContent.slice(0, firstParen).trim();
+        let argsStr = defContent.slice(firstParen + 1, defContent.lastIndexOf(')')).trim();
+        
+        const args = argsStr.split(',').map(a => a.trim()).filter(a => a && a !== 'self');
+        const cleanArgs = args.join(', ');
+
+        if (indentStack.length > 1) {
+          outLines.push(`${funcName}(${cleanArgs})`);
+        } else {
+          outLines.push(`function ${funcName}(${cleanArgs})`);
+        }
+        continue;
+      }
+
+      codeLine = codeLine
+        .replace(/\bTrue\b/g, 'true')
+        .replace(/\bFalse\b/g, 'false')
+        .replace(/\bNone\b/g, 'null')
+        .replace(/\belif\b/g, 'else if')
+        .replace(/\bpass\b/g, '/* pass */')
+        .replace(/\bself\./g, 'this.')
+        .replace(/\band\b/g, '&&')
+        .replace(/\bor\b/g, '||')
+        .replace(/\bnot\s+/g, '!')
+        .replace(/\bis\s+not\b/g, '!==')
+        .replace(/\bis\b/g, '===');
+
+      if (codeLine.endsWith(':')) {
+        codeLine = codeLine.slice(0, -1).trim();
+      }
+
+      if (codeLine.startsWith('for ')) {
+        const enumMatch = codeLine.match(/^for\s+(.+)\s+in\s+enumerate\((.+)\)$/);
+        if (enumMatch) {
+          const vars = enumMatch[1].trim();
+          const target = enumMatch[2].trim();
+          outLines.push(`for (let [${vars}] of py_enumerate(${target}))`);
+          continue;
+        }
+
+        const rangeMatch = codeLine.match(/^for\s+(.+)\s+in\s+range\((.+)\)$/);
+        if (rangeMatch) {
+          const varName = rangeMatch[1].trim();
+          const rangeArgs = rangeMatch[2].trim();
+          outLines.push(`for (let ${varName} of py_range(${rangeArgs}))`);
+          continue;
+        }
+
+        const inMatch = codeLine.match(/^for\s+(.+)\s+in\s+(.+)$/);
+        if (inMatch) {
+          const varName = inMatch[1].trim();
+          const target = inMatch[2].trim();
+          outLines.push(`for (let ${varName} of ${target})`);
+          continue;
+        }
+      }
+
+      if (codeLine.startsWith('while ')) {
+        const cond = codeLine.replace(/^while\s+/, '').trim();
+        outLines.push(`while (${cond})`);
+        continue;
+      }
+
+      if (codeLine.startsWith('if ') || codeLine.startsWith('else if ')) {
+        const isElseIf = codeLine.startsWith('else if ');
+        const cond = codeLine.replace(/^(if|else if)\s+/, '').trim();
+        outLines.push(`${isElseIf ? 'else if' : 'if'} (${cond})`);
+        continue;
+      }
+
+      if (codeLine === 'else') {
+        outLines.push('else');
+        continue;
+      }
+
+      codeLine = codeLine.replace(/([a-zA-Z0-9_$.]+)\s+in\s+([a-zA-Z0-9_$.]+)/g, 'py_in($1, $2)');
+      codeLine = codeLine.replace(/\.append\(/g, '.push(');
+      codeLine = codeLine.replace(/\blen\(([^)]+)\)/g, 'py_len($1)');
+
+      if (codeLine.includes('=') && !codeLine.includes('==') && !codeLine.includes('!=') && !codeLine.includes('<=') && !codeLine.includes('>=')) {
+        const parts = codeLine.split('=');
+        const left = parts[0].trim();
+        if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(left) && !['this', 'self', 'window'].includes(left)) {
+          codeLine = `let ${codeLine}`;
+        }
+      }
+
+      outLines.push(codeLine + ';');
+    }
+
+    while (indentStack.length > 1) {
+      indentStack.pop();
+      outLines.push('}');
+    }
+
+    return outLines.join('\n');
+  }
+
+  evaluateTranspiledJS(jsCode, testCase, problemId) {
+    const py_len = (obj) => (obj == null ? 0 : (Array.isArray(obj) || typeof obj === 'string' ? obj.length : Object.keys(obj).length));
+    const py_range = (a, b, c = 1) => {
+      let start = a, stop = b, step = c;
+      if (stop === undefined) { stop = start; start = 0; }
+      const res = [];
+      if (step > 0) { for (let i = start; i < stop; i += step) res.push(i); }
+      else if (step < 0) { for (let i = start; i > stop; i += step) res.push(i); }
+      return res;
+    };
+    const py_enumerate = (arr) => Array.from(arr).map((v, i) => [i, v]);
+    const py_in = (item, container) => {
+      if (container == null) return false;
+      if (Array.isArray(container) || typeof container === 'string') return container.includes(item);
+      if (typeof container === 'object') return Object.prototype.hasOwnProperty.call(container, item) || item in container;
+      return false;
+    };
+
+    const inputLines = testCase.input.split('\n');
+    const env = {};
+    for (let line of inputLines) {
+      if (line.includes('=')) {
+        const eqIdx = line.indexOf('=');
+        const varName = line.slice(0, eqIdx).trim();
+        const valStr = line.slice(eqIdx + 1).trim();
+        try {
+          env[varName] = JSON.parse(valStr.replace(/'/g, '"'));
+        } catch (e) {
+          env[varName] = valStr;
+        }
+      }
+    }
+
+    const evalFunc = new Function('py_len', 'py_range', 'py_enumerate', 'py_in', 'env', `
+      "use strict";
+      ${Object.keys(env).map(k => `let ${k} = env['${k}'];`).join('\n')}
+      
+      ${jsCode}
+
+      if (typeof Solution !== 'undefined') {
+        const sol = new Solution();
+        if (typeof sol.twoSum === 'function') return sol.twoSum(nums, target);
+        if (typeof sol.reverseString === 'function') {
+          const ret = sol.reverseString(s);
+          return ret !== undefined ? ret : s;
+        }
+        if (typeof sol.isValid === 'function') return sol.isValid(s);
+        if (typeof sol.merge === 'function') {
+          const ret = sol.merge(nums1, m, nums2, n);
+          return ret !== undefined ? ret : nums1;
+        }
+      }
+
+      if (typeof twoSum === 'function') return twoSum(nums, target);
+      if (typeof reverseString === 'function') {
+        const ret = reverseString(s);
+        return ret !== undefined ? ret : s;
+      }
+      if (typeof isValid === 'function') return isValid(s);
+      if (typeof merge === 'function') {
+        const ret = merge(nums1, m, nums2, n);
+        return ret !== undefined ? ret : nums1;
+      }
+
+      if (typeof stack !== 'undefined') return typeof stack.pop === 'function' ? stack.pop() : stack;
+      if (typeof result !== 'undefined') return result;
+      if (typeof ans !== 'undefined') return ans;
+      if (typeof s !== 'undefined') return s;
+      if (typeof nums1 !== 'undefined') return nums1;
+
+      return null;
+    `);
+
+    const gotVal = evalFunc(py_len, py_range, py_enumerate, py_in, env);
+    const gotStr = JSON.stringify(gotVal);
+
+    let expectedStr = testCase.expected.trim();
+    let expectedObj = expectedStr;
+    try {
+      expectedObj = JSON.parse(expectedStr.replace(/'/g, '"'));
+    } catch (e) {}
+
+    const isMatch = (JSON.stringify(gotVal) === JSON.stringify(expectedObj)) || (String(gotVal) === String(expectedStr)) || (gotStr === expectedStr);
+
+    if (isMatch) {
+      return {
+        status: 'CORRECT',
+        got: gotStr,
+        expected: expectedStr
+      };
+    } else {
+      return {
+        status: 'WRONG_ANSWER',
+        got: gotStr,
+        expected: expectedStr
+      };
+    }
+  }
+
   runCode() {
-    const prob = this.problems.find(p => p.id === this.currentProblemId) || this.problems[0];
+    const editor = document.getElementById('codelabCodeEditor');
+    const code = editor ? editor.value : '';
+
+    if (!code || !code.trim()) {
+      this.setRightTab('output');
+      const outputEl = document.getElementById('codelabOutputBody');
+      if (outputEl) {
+        outputEl.innerHTML = `
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 1rem; color: #ef4444; font-weight: 700; font-size: 0.9rem;">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.4rem;"></i> Please write your solution first.
+          </div>
+        `;
+      }
+      if (window.app && window.app.showToast) {
+        window.app.showToast('Please write your solution first.', 'circle-exclamation');
+      }
+      return;
+    }
+
     const btn = document.getElementById('codelabRunBtn');
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Running Test Cases...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Executing Python3 Code...';
     }
 
     setTimeout(() => {
@@ -489,41 +784,96 @@ Merge <code>nums2</code> into <code>nums1</code> as one sorted array.`,
       }
 
       this.setRightTab('output');
+      const prob = this.problems.find(p => p.id === this.currentProblemId) || this.problems[0];
+      const tc = prob.testCases[this.activeTestCaseIndex] || prob.testCases[0];
+
+      const res = this.executePython3(code, tc, prob.id);
       const outputEl = document.getElementById('codelabOutputBody');
+
       if (outputEl) {
-        outputEl.innerHTML = `
-          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-              <span style="font-weight: 800; color: #059669; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-solid fa-circle-check"></i> Accepted
-              </span>
-              <span style="font-size: 0.75rem; background: #10b981; color: #fff; padding: 0.15rem 0.55rem; border-radius: 9999px; font-weight: 700;">
-                All Test Cases Passed
-              </span>
+        if (res.status === 'CORRECT') {
+          outputEl.innerHTML = `
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 800; color: #059669; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-circle-check"></i> ✓ Correct Answer
+                </span>
+                <span style="font-size: 0.75rem; background: #10b981; color: #fff; padding: 0.15rem 0.55rem; border-radius: 9999px; font-weight: 700;">
+                  Passed
+                </span>
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-primary); margin-top: 0.5rem;">
+                <strong>Output:</strong> <code style="background: #1e293b; color: #38bdf8; padding: 0.2rem 0.5rem; border-radius: 4px;">${res.got}</code>
+              </div>
             </div>
-            <div style="display: flex; gap: 1.5rem; font-size: 0.8rem; color: var(--text-secondary);">
-              <div>⏱️ Runtime: <strong style="color: var(--text-primary);">38 ms</strong> (Beats 92.4%)</div>
-              <div>💾 Memory: <strong style="color: var(--text-primary);">16.2 MB</strong> (Beats 84.1%)</div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem;">Test Case Execution Summary:</div>
+            <pre style="background: #161922; color: #f8fafc; padding: 0.85rem 1rem; border-radius: var(--radius-md); font-family: monospace; font-size: 0.82rem; line-height: 1.5; margin: 0 0 1rem 0;">Test Case ${this.activeTestCaseIndex + 1}: ${tc.input.replace(/\n/g, ' | ')}
+Expected: ${res.expected} | Got: ${res.got} ✓</pre>
+          `;
+          if (window.app && window.app.showToast) {
+            window.app.showToast('✓ Correct Answer!', 'circle-check');
+          }
+        } else if (res.status === 'WRONG_ANSWER') {
+          outputEl.innerHTML = `
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 800; color: #ef4444; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-circle-xmark"></i> ✗ Wrong Answer
+                </span>
+                <span style="font-size: 0.75rem; background: #ef4444; color: #fff; padding: 0.15rem 0.55rem; border-radius: 9999px; font-weight: 700;">
+                  Failed
+                </span>
+              </div>
+              <div style="font-size: 0.85rem; font-family: monospace; line-height: 1.6; margin-top: 0.5rem;">
+                <div style="margin-bottom: 0.25rem;"><strong>Your Output:</strong></div>
+                <pre style="background: #1e293b; color: #f87171; padding: 0.5rem 0.75rem; border-radius: 4px; margin: 0 0 0.75rem 0;">${res.got}</pre>
+                <div style="margin-bottom: 0.25rem;"><strong>Expected Output:</strong></div>
+                <pre style="background: #1e293b; color: #4ade80; padding: 0.5rem 0.75rem; border-radius: 4px; margin: 0;">${res.expected}</pre>
+              </div>
             </div>
-          </div>
-
-          <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem;">Execution Output:</div>
-          <pre style="background: #161922; color: #f8fafc; padding: 0.85rem 1rem; border-radius: var(--radius-md); font-family: monospace; font-size: 0.82rem; line-height: 1.5; margin: 0 0 1rem 0;">Case 1: nums = [2, 7, 11, 15], target = 9
-Expected: [0, 1] | Got: [0, 1] ✓
-Case 2: nums = [3, 2, 4], target = 6
-Expected: [1, 2] | Got: [1, 2] ✓
-Case 3: nums = [3, 3], target = 6
-Expected: [0, 1] | Got: [0, 1] ✓</pre>
-        `;
+          `;
+          if (window.app && window.app.showToast) {
+            window.app.showToast('✗ Wrong Answer', 'circle-xmark');
+          }
+        } else {
+          outputEl.innerHTML = `
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 800; color: #d97706; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Runtime Error
+                </span>
+              </div>
+              <pre style="background: #1e293b; color: #fbbf24; padding: 0.75rem 1rem; border-radius: 4px; font-family: monospace; font-size: 0.84rem; line-height: 1.5; margin: 0.5rem 0 0 0; white-space: pre-wrap;">${res.output}</pre>
+            </div>
+          `;
+          if (window.app && window.app.showToast) {
+            window.app.showToast('Runtime Error', 'triangle-exclamation');
+          }
+        }
       }
-
-      if (window.app && window.app.showToast) {
-        window.app.showToast('✅ All test cases passed successfully!', 'circle-check');
-      }
-    }, 600);
+    }, 400);
   }
 
   submitSolution() {
+    const editor = document.getElementById('codelabCodeEditor');
+    const code = editor ? editor.value : '';
+
+    if (!code || !code.trim()) {
+      this.setRightTab('output');
+      const outputEl = document.getElementById('codelabOutputBody');
+      if (outputEl) {
+        outputEl.innerHTML = `
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 1rem; color: #ef4444; font-weight: 700; font-size: 0.9rem;">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.4rem;"></i> Please write your solution first.
+          </div>
+        `;
+      }
+      if (window.app && window.app.showToast) {
+        window.app.showToast('Please write your solution first.', 'circle-exclamation');
+      }
+      return;
+    }
+
     const btn = document.getElementById('codelabSubmitBtn');
     if (btn) {
       btn.disabled = true;
@@ -536,31 +886,86 @@ Expected: [0, 1] | Got: [0, 1] ✓</pre>
         btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Solution';
       }
 
-      this.solvedCount++;
-      const progEl = document.getElementById('codelabSolvedCountText');
-      if (progEl) progEl.textContent = `${this.solvedCount} Solved`;
-
       this.setRightTab('output');
+      const prob = this.problems.find(p => p.id === this.currentProblemId) || this.problems[0];
+      
+      let allPassed = true;
+      let firstFailure = null;
+
+      for (let i = 0; i < prob.testCases.length; i++) {
+        const tc = prob.testCases[i];
+        const res = this.executePython3(code, tc, prob.id);
+        if (res.status !== 'CORRECT') {
+          allPassed = false;
+          firstFailure = { tcIndex: i + 1, tc, res };
+          break;
+        }
+      }
+
       const outputEl = document.getElementById('codelabOutputBody');
       if (outputEl) {
-        outputEl.innerHTML = `
-          <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.05)); border: 1.5px solid #10b981; border-radius: var(--radius-lg); padding: 1.25rem; text-align: center; margin-bottom: 1rem;">
-            <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">🎉</div>
-            <h3 style="font-size: 1.25rem; font-weight: 800; color: #059669; margin: 0 0 0.35rem 0;">Solution Accepted & Recorded!</h3>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 0.85rem 0;">
-              Great work! You solved <strong>${this.problems.find(p => p.id === this.currentProblemId)?.title || 'Problem'}</strong>.
-            </p>
-            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #10b981; color: #ffffff; padding: 0.35rem 0.9rem; border-radius: 9999px; font-weight: 800; font-size: 0.82rem;">
-              <i class="fa-solid fa-coins"></i> +0.5 Credits Bounty Deposited
-            </div>
-          </div>
-        `;
-      }
+        if (allPassed) {
+          this.solvedCount++;
+          const progEl = document.getElementById('codelabSolvedCountText');
+          if (progEl) progEl.textContent = `${this.solvedCount} Solved`;
 
-      if (window.app && window.app.showToast) {
-        window.app.showToast(`🎉 Solution Accepted! Progress updated (${this.solvedCount} Solved)`, 'trophy');
+          outputEl.innerHTML = `
+            <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.05)); border: 1.5px solid #10b981; border-radius: var(--radius-lg); padding: 1.25rem; text-align: center; margin-bottom: 1rem;">
+              <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">🎉</div>
+              <h3 style="font-size: 1.25rem; font-weight: 800; color: #059669; margin: 0 0 0.35rem 0;">Solution Accepted & Recorded!</h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 0.85rem 0;">
+                Great work! You solved <strong>${prob.title}</strong> by passing all ${prob.testCases.length} test cases.
+              </p>
+              <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #10b981; color: #ffffff; padding: 0.35rem 0.9rem; border-radius: 9999px; font-weight: 800; font-size: 0.82rem;">
+                <i class="fa-solid fa-coins"></i> +0.5 Credits Bounty Deposited
+              </div>
+            </div>
+          `;
+          if (window.app && window.app.showToast) {
+            window.app.showToast(`🎉 Solution Accepted! Progress updated (${this.solvedCount} Solved)`, 'trophy');
+          }
+        } else if (firstFailure.res.status === 'WRONG_ANSWER') {
+          outputEl.innerHTML = `
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 800; color: #ef4444; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-circle-xmark"></i> ✗ Wrong Answer
+                </span>
+                <span style="font-size: 0.75rem; background: #ef4444; color: #fff; padding: 0.15rem 0.55rem; border-radius: 9999px; font-weight: 700;">
+                  Failed on Test Case ${firstFailure.tcIndex}
+                </span>
+              </div>
+              <div style="font-size: 0.85rem; font-family: monospace; line-height: 1.6; margin-top: 0.5rem;">
+                <div style="margin-bottom: 0.25rem;"><strong>Your Output:</strong></div>
+                <pre style="background: #1e293b; color: #f87171; padding: 0.5rem 0.75rem; border-radius: 4px; margin: 0 0 0.75rem 0;">${firstFailure.res.got}</pre>
+                <div style="margin-bottom: 0.25rem;"><strong>Expected Output:</strong></div>
+                <pre style="background: #1e293b; color: #4ade80; padding: 0.5rem 0.75rem; border-radius: 4px; margin: 0;">${firstFailure.res.expected}</pre>
+              </div>
+            </div>
+          `;
+          if (window.app && window.app.showToast) {
+            window.app.showToast(`✗ Wrong Answer on Test Case ${firstFailure.tcIndex}`, 'circle-xmark');
+          }
+        } else {
+          outputEl.innerHTML = `
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 800; color: #d97706; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Runtime Error
+                </span>
+                <span style="font-size: 0.75rem; background: #d97706; color: #fff; padding: 0.15rem 0.55rem; border-radius: 9999px; font-weight: 700;">
+                  Test Case ${firstFailure.tcIndex}
+                </span>
+              </div>
+              <pre style="background: #1e293b; color: #fbbf24; padding: 0.75rem 1rem; border-radius: 4px; font-family: monospace; font-size: 0.84rem; line-height: 1.5; margin: 0.5rem 0 0 0; white-space: pre-wrap;">${firstFailure.res.output}</pre>
+            </div>
+          `;
+          if (window.app && window.app.showToast) {
+            window.app.showToast('Runtime Error', 'triangle-exclamation');
+          }
+        }
       }
-    }, 800);
+    }, 500);
   }
 
   render() {
@@ -934,10 +1339,7 @@ Expected: [0, 1] | Got: [0, 1] ✓</pre>
           <div class="codelab-pane codelab-editor-pane">
             <div class="codelab-editor-header">
               <select class="codelab-lang-select" onchange="window.codelab.setLanguage(this.value)">
-                <option value="python3" ${this.selectedLanguage === 'python3' ? 'selected' : ''}>Python3</option>
-                <option value="javascript" ${this.selectedLanguage === 'javascript' ? 'selected' : ''}>JavaScript (Node.js)</option>
-                <option value="java" ${this.selectedLanguage === 'java' ? 'selected' : ''}>Java 17</option>
-                <option value="cpp" ${this.selectedLanguage === 'cpp' ? 'selected' : ''}>C++ 20</option>
+                <option value="python3" selected>Python3</option>
               </select>
 
               <button class="codelab-editor-reset-btn" onclick="window.codelab.resetCode()">
@@ -947,7 +1349,7 @@ Expected: [0, 1] | Got: [0, 1] ✓</pre>
 
             <div class="codelab-code-area-container">
               <div id="codelabLineNumbers" class="codelab-line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
-              <textarea id="codelabCodeEditor" class="codelab-code-textarea" spellcheck="false" oninput="window.codelab.updateLineNumbers()">${starterCode}</textarea>
+              <textarea id="codelabCodeEditor" class="codelab-code-textarea" spellcheck="false" oninput="window.codelab.updateLineNumbers()"></textarea>
             </div>
           </div>
 
