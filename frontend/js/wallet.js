@@ -47,27 +47,16 @@ class SkillSwapStore {
           localStorage.setItem('skillswap_active_persona', this.currentUser.id);
           sessionStorage.setItem('skillswap_logged_in', 'true');
           localStorage.setItem('skillswap_logged_in', 'true');
-        } else if (!isValid && this.token) {
-          // Verify if token is a valid unexpired JWT before wiping
-          try {
-            const parts = this.token.split('.');
-            if (parts.length === 3) {
-              const payload = JSON.parse(atob(parts[1]));
-              if (payload && payload.exp && payload.exp * 1000 > Date.now()) {
-                if (!this.currentUser && payload.id) {
-                  this.currentPersonaId = payload.id;
-                  sessionStorage.setItem('skillswap_logged_in', 'true');
-                  localStorage.setItem('skillswap_logged_in', 'true');
-                }
-              } else {
-                this.setToken(null);
-                sessionStorage.removeItem('skillswap_logged_in');
-                localStorage.removeItem('skillswap_logged_in');
-              }
-            }
-          } catch (e) {
-            // Keep existing session in offline/local mode
-          }
+        } else {
+          // Token is invalid because user account was deleted in database reset
+          this.setToken(null);
+          this.currentUser = null;
+          this.currentPersonaId = null;
+          this.personas = {};
+          localStorage.removeItem('skillswap_active_persona');
+          localStorage.removeItem('skillswap_vignan_store_v2');
+          sessionStorage.removeItem('skillswap_logged_in');
+          localStorage.removeItem('skillswap_logged_in');
         }
       }
 
