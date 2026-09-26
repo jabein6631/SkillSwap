@@ -18,6 +18,9 @@ class CodeLabModule {
     this.activeRightTab = 'testcases';
     this.activeTestCaseIndex = 0;
 
+    // Submitted / Solved Problems Tracking
+    this.submittedProblemIds = new Set();
+
     // Timer State
     this.timerSeconds = 0;
     this.timerRunning = false;
@@ -905,25 +908,32 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
       const outputEl = document.getElementById('codelabOutputBody');
       if (outputEl) {
         if (allPassed) {
-          this.solvedCount++;
+          if (!this.submittedProblemIds.has(prob.id)) {
+            this.submittedProblemIds.add(prob.id);
+            this.solvedCount++;
+          }
           const progEl = document.getElementById('codelabSolvedCountText');
           if (progEl) progEl.textContent = `${this.solvedCount} Solved`;
 
           outputEl.innerHTML = `
             <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.05)); border: 1.5px solid #10b981; border-radius: var(--radius-lg); padding: 1.25rem; text-align: center; margin-bottom: 1rem;">
               <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">🎉</div>
-              <h3 style="font-size: 1.25rem; font-weight: 800; color: #059669; margin: 0 0 0.35rem 0;">Solution Accepted & Recorded!</h3>
+              <h3 style="font-size: 1.25rem; font-weight: 800; color: #059669; margin: 0 0 0.35rem 0;">Solution Accepted & Submitted!</h3>
               <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 0.85rem 0;">
-                Great work! You solved <strong>${prob.title}</strong> by passing all ${prob.testCases.length} test cases.
+                Great work! You solved <strong>${prob.title}</strong>. Redirecting to problems list...
               </p>
               <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #10b981; color: #ffffff; padding: 0.35rem 0.9rem; border-radius: 9999px; font-weight: 800; font-size: 0.82rem;">
-                <i class="fa-solid fa-coins"></i> +0.5 Credits Bounty Deposited
+                <i class="fa-solid fa-check"></i> Redirecting...
               </div>
             </div>
           `;
           if (window.app && window.app.showToast) {
-            window.app.showToast(`🎉 Solution Accepted! Progress updated (${this.solvedCount} Solved)`, 'trophy');
+            window.app.showToast(`🎉 Solution Accepted & Submitted! Redirecting...`, 'trophy');
           }
+
+          setTimeout(() => {
+            this.backToProblems();
+          }, 1200);
         } else if (firstFailure.res.status === 'WRONG_ANSWER') {
           outputEl.innerHTML = `
             <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
@@ -1235,7 +1245,9 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
 
         <!-- Problems Rows -->
         <div class="codelab-problems-list">
-          ${filtered.map(p => `
+          ${filtered.map(p => {
+            const isSubmitted = this.submittedProblemIds && this.submittedProblemIds.has(p.id);
+            return `
             <div class="codelab-problem-row">
               <div class="codelab-problem-left">
                 <div class="codelab-problem-num">${p.num}</div>
@@ -1258,12 +1270,19 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
               </div>
 
               <div>
-                <button class="codelab-solve-btn" onclick="window.codelab.openProblem('${p.id}')">
-                  Solve <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                ${isSubmitted ? `
+                  <button class="codelab-solve-btn submitted" onclick="window.codelab.openProblem('${p.id}')" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35); font-weight: 700;">
+                    Submitted <i class="fa-solid fa-check" style="margin-left: 0.25rem;"></i>
+                  </button>
+                ` : `
+                  <button class="codelab-solve-btn" onclick="window.codelab.openProblem('${p.id}')">
+                    Solve <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                `}
               </div>
             </div>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
 
         <div style="text-align: center; margin: 1.5rem 0;">

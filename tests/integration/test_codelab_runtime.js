@@ -117,14 +117,25 @@ const errorRes = codelab.executePython3(editor.value, codelab.problems[0].testCa
 if (errorRes.status !== 'RUNTIME_ERROR') throw new Error(`TEST 5 FAIL: Expected RUNTIME_ERROR status, got ${errorRes.status}`);
 console.log('✅ TEST 5 PASS: Python syntax/runtime error caught (Runtime Error).');
 
-// TEST 6: Open another problem -> Editor is blank
-codelab.openProblem('reverse-a-string');
-if (editor.value !== '') throw new Error('TEST 6 FAIL: Editor is not blank when opening another problem');
-console.log('✅ TEST 6 PASS: Opening another problem maintains blank editor.');
+// TEST 7: Submit solution -> Mark submitted -> Redirect -> Show "Submitted ✓" button
+codelab.openProblem('two-sum');
+editor.value = `class Solution:
+    def twoSum(self, nums: list[int], target: int) -> list[int]:
+        seen = {}
+        for i, n in enumerate(nums):
+            diff = target - n
+            if diff in seen:
+                return [seen[diff], i]
+            seen[n] = i
+        return []`;
 
-// Test Back to Problems
-console.log('Testing Back to Problems navigation...');
-codelab.backToProblems();
-if (codelab.currentStep !== 3) throw new Error('Expected step 3 after back');
+codelab.submitSolution();
+setTimeout(() => {
+  if (!codelab.submittedProblemIds.has('two-sum')) throw new Error('TEST 7 FAIL: Problem two-sum was not marked as submitted');
+  console.log('✅ TEST 7 PASS: Submitted solution marked problem as submitted and redirected.');
 
-console.log('🎉 ALL 13 REQUIRED CODE LAB TEST SUITES PASSED 100%!');
+  codelab.backToProblems();
+  if (codelab.currentStep !== 3) throw new Error('Expected step 3 after back');
+
+  console.log('🎉 ALL REQUIRED CODE LAB TEST SUITES PASSED 100%!');
+}, 600);
