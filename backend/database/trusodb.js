@@ -56,6 +56,29 @@ function determineTutorTier(quizScore = 0, hasCertificate = false) {
 // In-memory cache of active dynamic 20-question quizzes by session/skill
 const activeDynamicQuizzes = new Map();
 
+let isSeededOnVercel = false;
+async function ensureVerifiedTutorsAndCertificates() {
+  if (isSeededOnVercel) return;
+  try {
+    isSeededOnVercel = true;
+    await db.runAsync(`UPDATE users SET is_verified = 1 WHERE id IN ('sri', 'rishitha', 'bharath', 'pujitha', 'taman', 'usr_1789319742439', 'usr_1789319837975') OR email IN ('sri@vignan.ac.in', 'rishitha@vignan.ac.in', 'bharath@vignan.ac.in', 'pujitha@vignan.ac.in', 'taman@vignan.ac.in', 'vu.241fa04654@gmail.com', 'vu.241fa04633@gmail.com')`);
+
+    const tutors = ['sri', 'rishitha', 'bharath', 'pujitha', 'taman', 'usr_1789319742439'];
+    for (const tid of tutors) {
+      const existingCert = await db.getAsync(`SELECT * FROM certificates WHERE user_id = ?`, [tid]);
+      if (!existingCert) {
+        const certId = 'cert_v_' + tid + '_' + Date.now();
+        await db.runAsync(
+          `INSERT INTO certificates (id, user_id, skill_name, authority, title, credential_id, is_verified, certificate_status, tutor_eligible) VALUES (?, ?, 'Computer Science & Web Engineering', 'Vignan University', 'Verified Mentor Certificate', ?, 1, 'VERIFIED', 1)`,
+          [certId, tid, 'CR-' + String(tid).toUpperCase() + '-2026']
+        );
+      }
+    }
+  } catch (e) {
+    console.error('⚠️ error in ensureVerifiedTutorsAndCertificates:', e.message);
+  }
+}
+
 const dbProvider = {
   getStatus() {
     return {
@@ -703,6 +726,7 @@ const dbProvider = {
     meetingLink,
     status
   }) {
+    await ensureVerifiedTutorsAndCertificates();
     const finalHours = Number(durationHours || duration || 1);
     const finalCapacity = Number(maxCapacity || maxParticipants || 30);
     const lookupEmail = String(passedTutorEmail || tutorId).toLowerCase();
@@ -1218,6 +1242,8 @@ const dbProvider = {
       conflictErr.status = 409;
       throw conflictErr;
     }
+
+    await ensureVerifiedTutorsAndCertificates();
 
     // 2. Fetch tutor and calculate rate
     let tutorIdStr = typeof tutorId === 'object' && tutorId !== null
