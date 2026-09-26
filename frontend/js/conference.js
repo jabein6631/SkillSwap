@@ -359,7 +359,7 @@ class SkillSwapConference {
 
   startSignalingPolling() {
     if (this.signalingInterval) clearInterval(this.signalingInterval);
-    this.lastSignalTime = Date.now() - 30000;
+    this.lastSignalTime = Date.now();
 
     // Immediately announce presence to room via HTTP signal POST
     this.sendSignalingMessage({
@@ -397,6 +397,7 @@ class SkillSwapConference {
   async handleSignalingMessage(msg) {
     const { type, peerId, senderPeerId, targetPeerId, userProfile, sdp, candidate, peers, mediaState, emoji, text, senderName } = msg;
     const remoteId = senderPeerId || peerId;
+    const uKey = (userProfile && userProfile.id) ? userProfile.id : remoteId;
 
     switch (type) {
       case 'support-update': {
@@ -409,8 +410,9 @@ class SkillSwapConference {
       case 'room-joined': {
         if (peers && Array.isArray(peers)) {
           for (const p of peers) {
-            if (p.peerId !== this.peerId) {
-              this.remoteUsers.set(p.peerId, p.userProfile);
+            const pKey = (p.userProfile && p.userProfile.id) ? p.userProfile.id : p.peerId;
+            if (p.peerId !== this.peerId && pKey !== this.currentUserProfile?.id) {
+              this.remoteUsers.set(pKey, p.userProfile);
               setTimeout(async () => {
                 if (!this.peerConnections.has(p.peerId)) {
                   console.log(`⚡ Initiating connection to existing peer: ${p.peerId}`);
@@ -425,17 +427,19 @@ class SkillSwapConference {
       }
 
       case 'peer-joined': {
-        if (remoteId && remoteId !== this.peerId) {
+        if (remoteId && remoteId !== this.peerId && uKey !== this.currentUserProfile?.id) {
           console.log(`👤 Peer Joined Meeting: ${userProfile?.name || remoteId}`);
-          this.remoteUsers.set(remoteId, userProfile);
+          const isNewPeer = !this.remoteUsers.has(uKey);
+          this.remoteUsers.set(uKey, userProfile);
           this.updateParticipantCount();
-          if (window.app?.showToast) {
+
+          if (isNewPeer && window.app?.showToast) {
             window.app.showToast(`👋 ${userProfile?.name || 'Peer'} joined the live meeting!`, 'user');
           }
           if (window.app && this.currentSessionData) {
             window.app.startSessionTimer(this.currentSessionData);
           }
-          // Existing or newly joined peer creates WebRTC connection & offer
+          // Initiate WebRTC connection if not already created
           if (!this.peerConnections.has(remoteId)) {
             await this.createPeerConnection(remoteId, true, userProfile);
           }
@@ -571,7 +575,7 @@ class SkillSwapConference {
     // Handle connection state changes
     pc.onconnectionstatechange = () => {
       console.log(`🌐 WebRTC Connection State with ${remotePeerId}: ${pc.connectionState}`);
-      if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+      if (pc.connectionState === 'closed') {
         this.handlePeerLeft(remotePeerId);
       }
     };
@@ -624,24 +628,27 @@ class SkillSwapConference {
       return;
     }
 
-    // Otherwise render in attendees grid tile
+    // Otherwise render in attendees grid tile (Keyed by User ID to prevent duplicates)
     if (attendeesGrid) {
-      let existingTile = document.getElementById(`peerTile_${peerId}`);
+      const tileId = profile.id ? `peerTile_${profile.id}` : `peerTile_${peerId}`;
+      const videoId = profile.id ? `peerVideo_${profile.id}` : `peerVideo_${peerId}`;
+
+      let existingTile = document.getElementById(tileId);
       if (!existingTile) {
         existingTile = document.createElement('div');
         existingTile.className = 'video-box student-tile';
-        existingTile.id = `peerTile_${peerId}`;
+        existingTile.id = tileId;
         existingTile.style.position = 'relative';
         existingTile.innerHTML = `
-          <video id="peerVideo_${peerId}" class="room-video-feed" autoplay playsinline style="display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit;"></video>
+          <video id="${videoId}" class="room-video-feed" autoplay playsinline style="display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit;"></video>
           <div class="video-live-badge"><span class="status-dot-green"></span> <span>HD 720p</span></div>
-          <div class="video-name-tag"><i class="fa-solid fa-graduation-cap"></i> <span id="peerNameTag_${peerId}">${profile.name} (${profile.role || 'Peer'})</span></div>
-          <div class="video-status-mic" id="peerMicTag_${peerId}"><i class="fa-solid fa-microphone"></i></div>
+          <div class="video-name-tag"><i class="fa-solid fa-graduation-cap"></i> <span>${profile.name} (${profile.role || 'Peer'})</span></div>
+          <div class="video-status-mic"><i class="fa-solid fa-microphone"></i></div>
         `;
         attendeesGrid.appendChild(existingTile);
       }
 
-      const videoEl = document.getElementById(`peerVideo_${peerId}`);
+      const videoEl = document.getElementById(videoId);
       if (videoEl) {
         videoEl.srcObject = stream;
         videoEl.muted = false; // Hear the peer!
