@@ -61,7 +61,7 @@ async function ensureVerifiedTutorsAndCertificates() {
   if (isSeededOnVercel) return;
   try {
     isSeededOnVercel = true;
-    await db.runAsync(`UPDATE users SET is_verified = 1 WHERE id IN ('sri', 'rishitha', 'bharath', 'pujitha', 'taman', 'usr_1789319742439', 'usr_1789319837975') OR email IN ('sri@vignan.ac.in', 'rishitha@vignan.ac.in', 'bharath@vignan.ac.in', 'pujitha@vignan.ac.in', 'taman@vignan.ac.in', 'vu.241fa04654@gmail.com', 'vu.241fa04633@gmail.com')`);
+    await db.runAsync(`UPDATE users SET is_verified = 1 WHERE id IN ('sri', 'rishitha', 'bharath', 'pujitha', 'taman')`);
 
     const tutors = ['sri', 'rishitha', 'bharath', 'pujitha', 'taman', 'usr_1789319742439'];
     for (const tid of tutors) {
