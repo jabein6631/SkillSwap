@@ -6,7 +6,7 @@
 class SkillSwapStore {
   constructor() {
     const origin = (typeof window !== 'undefined' && window.location) ? (window.location.origin || '') : '';
-    this.apiBase = (origin.includes(':3000')) ? '/api' : 'http://localhost:3000/api';
+    this.apiBase = '/api';
     this.storageKey = 'skillswap_vignan_store_v2';
     this.tokenKey = 'skillswap_auth_token';
     this.token = localStorage.getItem(this.tokenKey) || localStorage.getItem('token') || localStorage.getItem('auth_token') || null;
