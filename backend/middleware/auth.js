@@ -70,8 +70,11 @@ async function authenticateToken(req, res, next) {
   try {
     const decoded = verifyToken(token);
     
-    // Look up live user record from database
-    const user = await db.getAsync(`SELECT * FROM users WHERE id = ?`, [decoded.id]);
+    // Look up live user record from database by ID or Email
+    const user = await db.getAsync(
+      `SELECT * FROM users WHERE id = ? OR (email IS NOT NULL AND LOWER(email) = ?)`,
+      [decoded.id, String(decoded.email || decoded.id).toLowerCase()]
+    );
     if (!user) {
       return res.status(401).json({
         success: false,
