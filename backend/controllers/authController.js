@@ -411,32 +411,6 @@ const authController = {
     } catch (err) {
       next(err);
     }
-  },
-
-  async resetProdDb(req, res, next) {
-    try {
-      const tablesToClear = [
-        'code_lab_user_progress', 'quiz_attempts', 'masterclass_attendance', 'masterclass_registrations',
-        'masterclass_reports', 'session_attendees', 'signals', 'reviews', 'transactions', 'messages',
-        'notifications', 'support_answer_attachments', 'support_answers', 'support_doubt_attachments',
-        'support_doubts', 'support_tickets', 'certificate_verifications', 'rejected_certificates',
-        'certificates', 'mentor_availability', 'skills_offered', 'skills_wanted', 'login_history',
-        'sessions', 'users'
-      ];
-
-      for (const table of tablesToClear) {
-        try {
-          await db.runAsync(`DELETE FROM "${table}"`);
-        } catch (e) { }
-      }
-
-      res.json({
-        success: true,
-        message: 'Production database application tables reset to 0 rows!'
-      });
-    } catch (err) {
-      next(err);
-    }
   }
 };
 

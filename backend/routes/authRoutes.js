@@ -12,6 +12,5 @@ router.post('/login', authController.login);
 router.get('/me', authenticateToken, authController.getMe);
 router.get('/login-history', authenticateToken, authController.getLoginHistory);
 router.post('/supabase-sync', authController.supabaseSync);
-router.post('/reset-prod-db-98234', authController.resetProdDb);
 
 module.exports = router;
