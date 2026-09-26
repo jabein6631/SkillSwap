@@ -711,25 +711,15 @@ const dbProvider = {
 
     const tutorEmail = (tutor?.email || String(tutorId)).toLowerCase();
 
-    // Strict Backend Protection Rule: Check tutor's verified certificate status in DB
+    // Strict Backend Protection Rule: Check tutor's verified certificate status in DB by ID or Email
     let verifiedCert = await db.getAsync(
-      `SELECT * FROM certificates 
-       WHERE (user_id = ? OR LOWER(user_id) = ?) 
-         AND (certificate_status = 'VERIFIED' OR is_verified = 1)
+      `SELECT c.* FROM certificates c
+       LEFT JOIN users u ON (c.user_id = u.id OR LOWER(c.user_id) = LOWER(u.email))
+       WHERE (c.user_id = ? OR LOWER(c.user_id) = ? OR LOWER(u.email) = ? OR LOWER(u.email) = (SELECT LOWER(email) FROM users WHERE id = ?))
+         AND (c.certificate_status = 'VERIFIED' OR c.is_verified = 1)
        LIMIT 1`,
-      [tutorId, tutorEmail]
+      [tutorId, tutorEmail, tutorEmail, tutorId]
     );
-
-    if (!verifiedCert && tutorEmail.includes('@')) {
-      verifiedCert = await db.getAsync(
-        `SELECT c.* FROM certificates c
-         JOIN users u ON (c.user_id = u.id OR LOWER(c.user_id) = LOWER(u.email))
-         WHERE LOWER(u.email) = ?
-           AND (c.certificate_status = 'VERIFIED' OR c.is_verified = 1)
-         LIMIT 1`,
-        [tutorEmail]
-      );
-    }
 
     if (!verifiedCert && (tutor.is_admin === 1 || tutor.is_verified === 1 || (tutor.badges_json && (tutor.badges_json.includes('Verified') || tutor.badges_json.includes('Tutor'))))) {
       verifiedCert = { id: 'cert_auto_' + tutorId, is_verified: 1 };
