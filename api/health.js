@@ -12,6 +12,7 @@ module.exports = async (req, res) => {
       platform: 'SkillSwap Peer-to-Peer Hub',
       env: {
         hasTursoUrl: Boolean(process.env.TURSO_DATABASE_URL || process.env.TURSO_URL),
+        tursoHost: (process.env.TURSO_DATABASE_URL || process.env.TURSO_URL || '').split('@').pop(),
         hasTursoToken: Boolean(process.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_NTOKE || process.env.TURSO_TOKEN),
         hasSupabaseUrl: Boolean(process.env.SUPABASE_URL),
         hasSupabaseAnonKey: Boolean(process.env.SUPABASE_ANON_KEY),
