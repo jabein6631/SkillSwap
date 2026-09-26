@@ -1243,9 +1243,10 @@ class SkillSwapStore {
     formData.append('audio', blob, `voice-${Date.now()}.${ext}`);
     formData.append('duration', duration || 0);
 
-    const token = this.authToken || localStorage.getItem('skillswap_auth_token');
+    const activeToken = this.token || sessionStorage.getItem(this.tokenKey) || sessionStorage.getItem('token') || sessionStorage.getItem('auth_token') || localStorage.getItem(this.tokenKey) || localStorage.getItem('token');
     const headers = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (activeToken) headers['Authorization'] = `Bearer ${activeToken}`;
+    if (this.currentPersonaId) headers['x-user-id'] = this.currentPersonaId;
 
     const res = await fetch(`${this.apiBase}/chats/upload-voice`, {
       method: 'POST',
