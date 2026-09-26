@@ -1237,7 +1237,7 @@ const dbProvider = {
     );
     const isTutorEligible = Boolean(tutor.is_verified || cert);
     if (!isTutorEligible) {
-      throw new Error('This mentor has not passed certificate verification and is not eligible to take bookings.');
+      throw new Error(`This mentor has not passed certificate verification and is not eligible to take bookings (tutor_is_verified: ${tutor.is_verified}, cert_found: ${Boolean(cert)}).`);
     }
 
     const skill = await db.getAsync(
