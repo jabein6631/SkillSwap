@@ -1213,32 +1213,6 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
           </div>
         </div>
 
-        <!-- Multi-Step Stepper -->
-        <div class="codelab-stepper-container">
-          <div class="codelab-step-item ${isStep1 ? 'active' : 'completed'}" onclick="window.codelab.setStep(1)">
-            <div class="codelab-step-badge">
-              ${isStep1 ? '1' : '<i class="fa-solid fa-check"></i>'}
-            </div>
-            <span class="codelab-step-label">Select Subject</span>
-          </div>
-
-          <div class="codelab-step-line ${!isStep1 ? 'completed' : ''}"></div>
-
-          <div class="codelab-step-item ${isStep2 ? 'active' : (isStep3 ? 'completed' : '')}" onclick="window.codelab.setStep(2)">
-            <div class="codelab-step-badge">
-              ${isStep3 ? '<i class="fa-solid fa-check"></i>' : '2'}
-            </div>
-            <span class="codelab-step-label">Choose Difficulty</span>
-          </div>
-
-          <div class="codelab-step-line ${isStep3 ? 'completed' : ''}"></div>
-
-          <div class="codelab-step-item ${isStep3 ? 'active' : ''}" onclick="window.codelab.setStep(3)">
-            <div class="codelab-step-badge">3</div>
-            <span class="codelab-step-label">Start Solving</span>
-          </div>
-        </div>
-
         <!-- Dynamic Step Content -->
         ${isStep1 ? this.renderStep1Html() : (isStep2 ? this.renderStep2Html() : this.renderStep3Html())}
       </div>
