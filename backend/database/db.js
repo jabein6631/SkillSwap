@@ -66,7 +66,7 @@ db.getAsync = function (sql, params = []) {
       return res.rows[0];
     }).catch((err) => {
       console.error('⚠️ [Turso Query Error in getAsync]:', err.message);
-      return null;
+      throw err;
     });
   }
   return new Promise((resolve) => {
