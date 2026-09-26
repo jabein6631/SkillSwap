@@ -121,6 +121,7 @@ const sessionController = {
 
       const result = await supabaseService.createGroupCohortSession({
         tutorId,
+        tutorEmail: req.user?.email,
         skillName: skillName || subject || title || 'Group Masterclass',
         title: title || topic || skillName,
         topic: topic || title || skillName,

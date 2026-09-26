@@ -677,6 +677,7 @@ const dbProvider = {
 
   async createGroupCohortSession({
     tutorId,
+    tutorEmail: passedTutorEmail,
     skillName,
     title,
     topic,
@@ -704,21 +705,22 @@ const dbProvider = {
   }) {
     const finalHours = Number(durationHours || duration || 1);
     const finalCapacity = Number(maxCapacity || maxParticipants || 30);
-    let tutor = await db.getAsync(`SELECT * FROM users WHERE id = ? OR LOWER(email) = ?`, [tutorId, String(tutorId).toLowerCase()]);
+    const lookupEmail = String(passedTutorEmail || tutorId).toLowerCase();
+    let tutor = await db.getAsync(`SELECT * FROM users WHERE id = ? OR LOWER(email) = ?`, [tutorId, lookupEmail]);
     if (!tutor) {
-      tutor = { id: tutorId, email: tutorId };
+      tutor = { id: tutorId, email: passedTutorEmail || tutorId };
     }
 
-    const tutorEmail = (tutor?.email || String(tutorId)).toLowerCase();
+    const tutorEmail = (passedTutorEmail || tutor?.email || String(tutorId)).toLowerCase();
 
     // Strict Backend Protection Rule: Check tutor's verified certificate status in DB by ID or Email
     let verifiedCert = await db.getAsync(
       `SELECT c.* FROM certificates c
        LEFT JOIN users u ON (c.user_id = u.id OR LOWER(c.user_id) = LOWER(u.email))
-       WHERE (c.user_id = ? OR LOWER(c.user_id) = ? OR LOWER(u.email) = ? OR LOWER(u.email) = (SELECT LOWER(email) FROM users WHERE id = ?))
+       WHERE (c.user_id = ? OR LOWER(c.user_id) = ? OR LOWER(c.user_id) = ? OR LOWER(u.email) = ? OR LOWER(u.email) = ?)
          AND (c.certificate_status = 'VERIFIED' OR c.is_verified = 1)
        LIMIT 1`,
-      [tutorId, tutorEmail, tutorEmail, tutorId]
+      [tutorId, tutorEmail, String(tutorId).toLowerCase(), tutorEmail, String(tutorId).toLowerCase()]
     );
 
     if (!verifiedCert && (tutor.is_admin === 1 || tutor.is_verified === 1 || (tutor.badges_json && (tutor.badges_json.includes('Verified') || tutor.badges_json.includes('Tutor'))))) {
