@@ -600,6 +600,19 @@ async function initSchema() {
     )
   `);
 
+  // 27. WebRTC Signaling Table for Persistent Cross-Container Serverless Exchange
+  await db.runAsync(`
+    CREATE TABLE IF NOT EXISTS signals (
+      id TEXT PRIMARY KEY,
+      session_id TEXT NOT NULL,
+      sender_peer_id TEXT NOT NULL,
+      target_peer_id TEXT,
+      signal_data TEXT NOT NULL,
+      created_at_ms INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   const existingSubj = await db.getAsync(`SELECT COUNT(*) as count FROM subjects`);
   if (!existingSubj || existingSubj.count === 0) {
     const defaultSubjects = [

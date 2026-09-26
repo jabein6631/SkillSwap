@@ -3034,33 +3034,50 @@ const dbProvider = {
    * Determine whether a session has passed its scheduled end time
    * Server Source of Truth logic
    */
-  signalStore: new Map(),
-
   async addSignal(sessionId, signalData) {
-    if (!this.signalStore.has(sessionId)) {
-      this.signalStore.set(sessionId, []);
+    try {
+      const signalId = 'sig_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+      const senderPeerId = signalData.senderPeerId || signalData.peerId || '';
+      const targetPeerId = signalData.targetPeerId || null;
+      const nowMs = Date.now();
+      const payloadStr = JSON.stringify(signalData);
+
+      await db.runAsync(
+        `INSERT INTO signals (id, session_id, sender_peer_id, target_peer_id, signal_data, created_at_ms)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [signalId, sessionId, senderPeerId, targetPeerId, payloadStr, nowMs]
+      );
+      return { success: true };
+    } catch (e) {
+      console.warn('DB addSignal notice:', e.message);
+      return { success: false, error: e.message };
     }
-    const queue = this.signalStore.get(sessionId);
-    const item = {
-      timestamp: Date.now(),
-      signal: signalData
-    };
-    queue.push(item);
-    if (queue.length > 200) {
-      queue.shift();
-    }
-    return { success: true };
   },
 
   async getSignals(sessionId, peerId, sinceMs = 0) {
-    const queue = this.signalStore.get(sessionId) || [];
-    const filtered = queue
-      .filter(item => item.timestamp > Number(sinceMs || 0))
-      .map(item => ({ ...item.signal, timestamp: item.timestamp }))
-      .filter(sig => !sig.peerId || sig.peerId !== peerId)
-      .filter(sig => !sig.targetPeerId || sig.targetPeerId === peerId);
+    try {
+      const rows = await db.allAsync(
+        `SELECT * FROM signals
+         WHERE session_id = ? 
+           AND created_at_ms > ? 
+           AND sender_peer_id != ? 
+           AND (target_peer_id IS NULL OR target_peer_id = ?)
+         ORDER BY created_at_ms ASC`,
+        [sessionId, Number(sinceMs || 0), String(peerId || ''), String(peerId || '')]
+      );
 
-    return filtered;
+      return rows.map(r => {
+        try {
+          const parsed = JSON.parse(r.signal_data);
+          return { ...parsed, timestamp: r.created_at_ms };
+        } catch (e) {
+          return null;
+        }
+      }).filter(Boolean);
+    } catch (e) {
+      console.warn('DB getSignals notice:', e.message);
+      return [];
+    }
   },
 
   isSessionExpired(session) {
