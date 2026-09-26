@@ -3042,12 +3042,12 @@ const dbProvider = {
       const nowMs = Date.now();
       const payloadStr = JSON.stringify(signalData);
 
-      await db.runAsync(
+      const res = await db.runAsync(
         `INSERT INTO signals (id, session_id, sender_peer_id, target_peer_id, signal_data, created_at_ms)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [signalId, sessionId, senderPeerId, targetPeerId, payloadStr, nowMs]
       );
-      return { success: true };
+      return { success: true, res };
     } catch (e) {
       console.warn('DB addSignal notice:', e.message);
       return { success: false, error: e.message };
@@ -3076,7 +3076,7 @@ const dbProvider = {
       }).filter(Boolean);
     } catch (e) {
       console.warn('DB getSignals notice:', e.message);
-      return [];
+      return [{ _dbError: e.message }];
     }
   },
 
