@@ -184,7 +184,7 @@ const chatController = {
 
       const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
       const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' });
 
       await db.runAsync(
         `INSERT INTO messages (

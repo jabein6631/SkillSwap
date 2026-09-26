@@ -9778,6 +9778,17 @@
           const checkIcon = isDelivered ? 'fa-check-double' : 'fa-check';
           const checkTitle = isRead ? 'Read' : (isDelivered ? 'Delivered' : 'Sent');
 
+          const rawCreated = msg.created_at || msg.created_at_ms;
+          let msgTimeDisplay = msg.time || 'Just now';
+          if (rawCreated) {
+            try {
+              const d = new Date(rawCreated);
+              if (!isNaN(d.getTime())) {
+                msgTimeDisplay = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              }
+            } catch (e) { }
+          }
+
           if (isVoice) {
             const player = this.activeVoicePlayers[msg.id];
             const isPlaying = player && !player.audio.paused;
@@ -9824,7 +9835,7 @@
                   </div>
                 </div>
                 <div class="message-time">
-                  <span>${msg.time || 'Just now'}</span>
+                  <span>${msgTimeDisplay}</span>
                   ${isOut ? `<span class="chat-read-receipt" style="color: ${checkColor}; margin-left: 4px; font-size: 0.72rem;" title="${checkTitle}"><i class="fa-solid ${checkIcon}"></i></span>` : ''}
                 </div>
               </div>
@@ -9835,7 +9846,7 @@
             <div class="message-bubble ${isOut ? 'outgoing' : 'incoming'}">
               <div class="message-text">${this.escapeHtml(msg.text)}</div>
               <div class="message-time">
-                <span>${msg.time || 'Just now'}</span>
+                <span>${msgTimeDisplay}</span>
                 ${isOut ? `<span class="chat-read-receipt" style="color: ${checkColor}; margin-left: 4px; font-size: 0.72rem;" title="${checkTitle}"><i class="fa-solid ${checkIcon}"></i></span>` : ''}
               </div>
             </div>
