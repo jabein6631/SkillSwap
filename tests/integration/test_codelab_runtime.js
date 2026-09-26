@@ -60,7 +60,7 @@ console.log('✅ Step 2 verified with 3 difficulty tiers and selection.');
 console.log('Testing Step 3: Start Solving...');
 codelab.setStep(3);
 if (codelab.currentStep !== 3) throw new Error('Expected step 3');
-if (codelab.problems.length !== 6) throw new Error('Expected 6 problems');
+if (codelab.problems.length !== 18) throw new Error('Expected 18 total problems across stages');
 codelab.setProblemFilter('CODING');
 if (codelab.problemFilter !== 'CODING') throw new Error('Problem filter failed');
 console.log('✅ Step 3 verified with problems list and filtering.');

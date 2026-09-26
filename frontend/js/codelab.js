@@ -82,127 +82,70 @@ class CodeLabModule {
       }
     ];
 
-    // Problems Dataset
+    // Problems Dataset (Categorized by Beginner, Intermediate, Advanced)
     this.problems = [
+      // --- BEGINNER STAGE ---
       {
         id: 'two-sum',
         num: 1,
         title: 'Two Sum',
-        difficulty: 'Easy',
+        difficulty: 'Beginner',
         type: 'Coding',
         tags: ['Coding', 'Arrays', 'Hash Map'],
         solvedCount: '12.4K solved',
         timeEstimate: '10–15 mins',
-        description: `Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.
-
-You may assume that each input would have exactly one solution, and you may not use the same element twice.
-
-You can return the answer in any order.`,
+        description: `Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.`,
         examples: [
-          {
-            input: 'nums = [2, 7, 11, 15], target = 9',
-            output: '[0, 1]',
-            explanation: 'Because nums[0] + nums[1] == 2 + 7 == 9, we return [0, 1].'
-          },
-          {
-            input: 'nums = [3, 2, 4], target = 6',
-            output: '[1, 2]',
-            explanation: 'Because nums[1] + nums[2] == 2 + 4 == 6, we return [1, 2].'
-          },
-          {
-            input: 'nums = [3, 3], target = 6',
-            output: '[0, 1]',
-            explanation: 'Because nums[0] + nums[1] == 3 + 3 == 6, we return [0, 1].'
-          }
+          { input: 'nums = [2, 7, 11, 15], target = 9', output: '[0, 1]', explanation: '2 + 7 == 9, return [0, 1].' }
         ],
-        constraints: [
-          '2 <= nums.length <= 10^4',
-          '-10^9 <= nums[i] <= 10^9',
-          '-10^9 <= target <= 10^9',
-          'Only one valid answer exists.'
-        ],
-        hints: [
-          'A really brute force way would be to search for all possible pairs of numbers but that would be slow (O(N^2)).',
-          'Can we use extra space? We can use a Hash Map to look up the complement in O(1) time.'
-        ],
+        constraints: ['2 <= nums.length <= 10^4'],
+        hints: ['Use a hash map to look up complements in O(1) time.'],
         referenceSolution: {
           python3: `class Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        seen = {}\n        for i, n in enumerate(nums):\n            diff = target - n\n            if diff in seen:\n                return [seen[diff], i]\n            seen[n] = i\n        return []`
         },
         starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
-          { input: 'nums = [2, 7, 11, 15]\ntarget = 9', expected: '[0, 1]' },
-          { input: 'nums = [3, 2, 4]\ntarget = 6', expected: '[1, 2]' },
-          { input: 'nums = [3, 3]\ntarget = 6', expected: '[0, 1]' }
+          { input: 'nums = [2, 7, 11, 15]\ntarget = 9', expected: '[0, 1]' }
         ]
       },
       {
         id: 'reverse-a-string',
         num: 2,
         title: 'Reverse a String',
-        difficulty: 'Easy',
+        difficulty: 'Beginner',
         type: 'Coding',
         tags: ['Coding', 'Strings', 'Basics'],
         solvedCount: '10.1K solved',
         timeEstimate: '5–10 mins',
-        description: `Write a program to reverse a given string in-place.
-
-The input string is given as an array of characters <code>s</code>.
-
-You must do this by modifying the input array in-place with <code>O(1)</code> extra memory.`,
+        description: `Write a program to reverse a given string in-place.`,
         examples: [
-          {
-            input: 's = ["h","e","l","l","o"]',
-            output: '["o","l","l","e","h"]',
-            explanation: 'The characters are inverted from start to end.'
-          },
-          {
-            input: 's = ["H","a","n","n","a","h"]',
-            output: '["h","a","n","n","a","H"]',
-            explanation: 'Palindrome-style character swapping.'
-          }
+          { input: 's = ["h","e","l","l","o"]', output: '["o","l","l","e","h"]' }
         ],
-        constraints: [
-          '1 <= s.length <= 10^5',
-          's[i] is a printable ascii character.'
-        ],
-        hints: [
-          'The entire logic is based on using two pointers: one at the start, one at the end.'
-        ],
+        constraints: ['1 <= s.length <= 10^5'],
+        hints: ['Use two pointers swapping from start and end.'],
         referenceSolution: {
           python3: `class Solution:\n    def reverseString(self, s: list[str]) -> None:\n        left, right = 0, len(s) - 1\n        while left < right:\n            s[left], s[right] = s[right], s[left]\n            left += 1\n            right -= 1`
         },
         starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
-          { input: 's = ["h","e","l","l","o"]', expected: '["o","l","l","e","h"]' },
-          { input: 's = ["H","a","n","n","a","h"]', expected: '["h","a","n","n","a","H"]' }
+          { input: 's = ["h","e","l","l","o"]', expected: '["o","l","l","e","h"]' }
         ]
       },
       {
         id: 'what-is-a-stack',
         num: 3,
         title: 'What is a Stack?',
-        difficulty: 'Easy',
+        difficulty: 'Beginner',
         type: 'Conceptual',
         tags: ['Conceptual', 'Data Structures', 'Theory'],
         solvedCount: '8.7K solved',
         timeEstimate: '2–5 mins',
-        description: `Which data structure follows the <strong>LIFO (Last In First Out)</strong> principle?
-
-Analyze stack operations, real-world examples (call stack, undo operations, browser history back/forward), and asymptotic time complexities.`,
+        description: `Which data structure follows the <strong>LIFO (Last In First Out)</strong> principle?`,
         examples: [
-          {
-            input: 'Operations: push(10), push(20), pop()',
-            output: '20',
-            explanation: 'The element inserted last (20) is removed first.'
-          }
+          { input: 'Operations: push(10), push(20), pop()', output: '20' }
         ],
-        constraints: [
-          'Stack operations: push, pop, peek, isEmpty',
-          'Expected operational time complexity: O(1)'
-        ],
-        hints: [
-          'Think of a stack of plates in a cafeteria: the plate placed last is taken first.'
-        ],
+        constraints: ['Stack operations: push, pop, peek'],
+        hints: ['LIFO principle (Last In First Out).'],
         referenceSolution: {
           python3: `class Stack:\n    def __init__(self):\n        self.items = []\n    def push(self, item):\n        self.items.append(item)\n    def pop(self):\n        return self.items.pop() if self.items else None`
         },
@@ -212,104 +155,352 @@ Analyze stack operations, real-world examples (call stack, undo operations, brow
         ]
       },
       {
-        id: 'valid-parentheses',
-        num: 4,
-        title: 'Valid Parentheses',
-        difficulty: 'Easy',
-        type: 'Coding',
-        tags: ['Coding', 'Stack', 'Strings'],
-        solvedCount: '6.3K solved',
-        timeEstimate: '15–20 mins',
-        description: `Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.
-
-An input string is valid if:
-1. Open brackets must be closed by the same type of brackets.
-2. Open brackets must be closed in the correct order.
-3. Every close bracket has a corresponding open bracket of the same type.`,
-        examples: [
-          { input: 's = "()"', output: 'true', explanation: 'Matching pair of parentheses.' },
-          { input: 's = "()[]{}"', output: 'true', explanation: 'All three pairs properly closed.' },
-          { input: 's = "(]"', output: 'false', explanation: 'Mismatched closing bracket.' }
-        ],
-        constraints: [
-          '1 <= s.length <= 10^4',
-          's consists of parentheses only \'()[]{}\'.'
-        ],
-        hints: [
-          'Use a stack to track open brackets and match them with incoming closing brackets.'
-        ],
-        referenceSolution: {
-          python3: `class Solution:\n    def isValid(self, s: str) -> bool:\n        stack = []\n        mapping = {")": "(", "}": "{", "]": "["}\n        for char in s:\n            if char in mapping:\n                top = stack.pop() if stack else "#"\n                if mapping[char] != top:\n                    return False\n            else:\n                stack.append(char)\n        return not stack`
-        },
-        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
-        testCases: [
-          { input: 's = "()"', expected: 'true' },
-          { input: 's = "()[]{}"', expected: 'true' },
-          { input: 's = "(]"', expected: 'false' }
-        ]
-      },
-      {
         id: 'time-complexity-basics',
-        num: 5,
+        num: 4,
         title: 'Time Complexity Basics',
-        difficulty: 'Easy',
+        difficulty: 'Beginner',
         type: 'Conceptual',
         tags: ['Conceptual', 'Algorithms', 'Theory'],
         solvedCount: '5.9K solved',
         timeEstimate: '5–10 mins',
-        description: `What is the time complexity of binary search on a sorted array of size N?
-
-Explain the halving principle: each iteration divides the search space into half (N, N/2, N/4 ... 1). Thus, 2^k = N implies k = log2(N).`,
+        description: `What is the maximum number of comparisons for binary search on a sorted array of size 1024?`,
         examples: [
-          { input: 'Search in 1024 elements', output: 'O(log N) -> 10 iterations max', explanation: '2^10 = 1024' }
+          { input: 'Array length = 1024', output: '10 comparisons' }
         ],
-        constraints: [
-          'Array must be sorted',
-          'Random access in O(1)'
-        ],
-        hints: [
-          'Binary search repeatedly halves the search space.'
-        ],
+        constraints: ['Logarithmic complexity O(log N)'],
+        hints: ['2^10 = 1024.'],
         referenceSolution: {
-          python3: `def binarySearchTimeComplexity(n):\n    return "O(log N)"`
+          python3: `def binarySearchComparisons(n):\n    return 10`
         },
         starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
-          { input: 'Array length = 1024', expected: 'log2(1024) = 10 comparisons' }
+          { input: 'n = 1024', expected: '10' }
+        ]
+      },
+      {
+        id: 'palindrome-number',
+        num: 5,
+        title: 'Palindrome Number',
+        difficulty: 'Beginner',
+        type: 'Coding',
+        tags: ['Coding', 'Math', 'Basics'],
+        solvedCount: '9.3K solved',
+        timeEstimate: '5–10 mins',
+        description: `Given an integer <code>x</code>, return <code>true</code> if <code>x</code> is a palindrome, and <code>false</code> otherwise.`,
+        examples: [
+          { input: 'x = 121', output: 'true' }
+        ],
+        constraints: ['-2^31 <= x <= 2^31 - 1'],
+        hints: ['Convert x to string or reverse the digits mathematically.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def isPalindrome(self, x: int) -> bool:\n        if x < 0: return False\n        s = str(x)\n        return s == s[::-1]`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'x = 121', expected: 'true' }
+        ]
+      },
+      {
+        id: 'fizz-buzz',
+        num: 6,
+        title: 'Fizz Buzz',
+        difficulty: 'Beginner',
+        type: 'Coding',
+        tags: ['Coding', 'Control Flow', 'Strings'],
+        solvedCount: '15.1K solved',
+        timeEstimate: '5–10 mins',
+        description: `Given an integer <code>n</code>, return a string array <code>answer</code> (1-indexed) where answer[i] == "FizzBuzz" if divisible by 3 and 5, "Fizz" if divisible by 3, "Buzz" if divisible by 5.`,
+        examples: [
+          { input: 'n = 5', output: '["1","2","Fizz","4","Buzz"]' }
+        ],
+        constraints: ['1 <= n <= 10^4'],
+        hints: ['Check divisibility using % 15, % 3, % 5.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def fizzBuzz(self, n: int) -> list[str]:\n        res = []\n        for i in range(1, n + 1):\n          if i % 15 == 0: res.append("FizzBuzz")\n          elif i % 3 == 0: res.append("Fizz")\n          elif i % 5 == 0: res.append("Buzz")\n          else: res.append(str(i))\n        return res`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'n = 5', expected: '["1","2","Fizz","4","Buzz"]' }
+        ]
+      },
+
+      // --- INTERMEDIATE STAGE ---
+      {
+        id: 'valid-parentheses',
+        num: 1,
+        title: 'Valid Parentheses',
+        difficulty: 'Intermediate',
+        type: 'Coding',
+        tags: ['Coding', 'Stack', 'Strings'],
+        solvedCount: '8.3K solved',
+        timeEstimate: '15–20 mins',
+        description: `Given a string <code>s</code> containing just brackets <code>'()'</code>, <code>'{}'</code>, <code>'[]'</code>, determine if the input string is valid.`,
+        examples: [
+          { input: 's = "()"', output: 'true' }
+        ],
+        constraints: ['1 <= s.length <= 10^4'],
+        hints: ['Use a stack data structure to match brackets.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def isValid(self, s: str) -> bool:\n        stack = []\n        mapping = {")": "(", "}": "{", "]": "["}\n        for char in s:\n            if char in mapping:\n                top = stack.pop() if stack else "#"\n                if mapping[char] != top: return False\n            else: stack.append(char)\n        return not stack`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 's = "()"', expected: 'true' }
         ]
       },
       {
         id: 'merge-two-sorted-arrays',
-        num: 6,
+        num: 2,
         title: 'Merge Two Sorted Arrays',
-        difficulty: 'Easy',
+        difficulty: 'Intermediate',
         type: 'Coding',
         tags: ['Coding', 'Arrays', 'Two Pointers'],
-        solvedCount: '4.1K solved',
+        solvedCount: '6.1K solved',
         timeEstimate: '20–30 mins',
-        description: `You are given two integer arrays <code>nums1</code> and <code>nums2</code>, sorted in non-decreasing order.
-
-Merge <code>nums2</code> into <code>nums1</code> as one sorted array.`,
+        description: `Merge two sorted arrays <code>nums1</code> and <code>nums2</code> into <code>nums1</code> as one sorted array.`,
         examples: [
-          {
-            input: 'nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3',
-            output: '[1,2,2,3,5,6]',
-            explanation: 'Merged array is [1,2,2,3,5,6].'
-          }
+          { input: 'nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3', output: '[1,2,2,3,5,6]' }
         ],
-        constraints: [
-          'nums1.length == m + n',
-          'nums2.length == n'
-        ],
-        hints: [
-          'Start filling nums1 from the back to avoid overwriting elements.'
-        ],
+        constraints: ['nums1.length == m + n'],
+        hints: ['Fill nums1 from the back to avoid overwriting.'],
         referenceSolution: {
           python3: `class Solution:\n    def merge(self, nums1: list[int], m: int, nums2: list[int], n: int) -> None:\n        p1, p2, p = m - 1, n - 1, m + n - 1\n        while p2 >= 0:\n            if p1 >= 0 and nums1[p1] > nums2[p2]:\n                nums1[p] = nums1[p1]\n                p1 -= 1\n            else:\n                nums1[p] = nums2[p2]\n                p2 -= 1\n            p -= 1`
         },
         starterCode: { python3: '', javascript: '', java: '', cpp: '' },
         testCases: [
           { input: 'nums1 = [1,2,3,0,0,0], m = 3\nnums2 = [2,5,6], n = 3', expected: '[1,2,2,3,5,6]' }
+        ]
+      },
+      {
+        id: 'container-with-most-water',
+        num: 3,
+        title: 'Container With Most Water',
+        difficulty: 'Intermediate',
+        type: 'Coding',
+        tags: ['Coding', 'Two Pointers', 'Greedy'],
+        solvedCount: '5.8K solved',
+        timeEstimate: '20–25 mins',
+        description: `Given <code>n</code> non-negative integers <code>height</code>, find two lines that together with the x-axis form a container containing the most water.`,
+        examples: [
+          { input: 'height = [1,8,6,2,5,4,8,3,7]', output: '49' }
+        ],
+        constraints: ['n == height.length'],
+        hints: ['Use two pointers at start and end, shrinking the shorter line.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def maxArea(self, height: list[int]) -> int:\n        left, right = 0, len(height) - 1\n        max_w = 0\n        while left < right:\n            w = min(height[left], height[right]) * (right - left)\n            max_w = max(max_w, w)\n            if height[left] < height[right]: left += 1\n            else: right -= 1\n        return max_w`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'height = [1,8,6,2,5,4,8,3,7]', expected: '49' }
+        ]
+      },
+      {
+        id: 'three-sum',
+        num: 4,
+        title: '3Sum',
+        difficulty: 'Intermediate',
+        type: 'Coding',
+        tags: ['Coding', 'Arrays', 'Two Pointers'],
+        solvedCount: '7.2K solved',
+        timeEstimate: '25–30 mins',
+        description: `Given an integer array <code>nums</code>, return all the triplets <code>[nums[i], nums[j], nums[k]]</code> such that <code>i != j != k</code> and <code>nums[i] + nums[j] + nums[k] == 0</code>.`,
+        examples: [
+          { input: 'nums = [-1,0,1,2,-1,-4]', output: '[[-1,-1,2],[-1,0,1]]' }
+        ],
+        constraints: ['3 <= nums.length <= 3000'],
+        hints: ['Sort array first, then use two pointers for remaining two elements.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def threeSum(self, nums: list[int]) -> list[list[int]]:\n        nums.sort()\n        res = []\n        for i in range(len(nums) - 2):\n            if i > 0 and nums[i] == nums[i-1]: continue\n            l, r = i + 1, len(nums) - 1\n            while l < r:\n                s = nums[i] + nums[l] + nums[r]\n                if s == 0:\n                    res.append([nums[i], nums[l], nums[r]])\n                    while l < r and nums[l] == nums[l+1]: l += 1\n                    while l < r and nums[r] == nums[r-1]: r -= 1\n                    l += 1; r -= 1\n                elif s < 0: l += 1\n                else: r -= 1\n        return res`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'nums = [-1,0,1,2,-1,-4]', expected: '[[-1,-1,2],[-1,0,1]]' }
+        ]
+      },
+      {
+        id: 'what-is-dp',
+        num: 5,
+        title: 'What is Dynamic Programming?',
+        difficulty: 'Intermediate',
+        type: 'Conceptual',
+        tags: ['Conceptual', 'Dynamic Programming', 'Theory'],
+        solvedCount: '4.5K solved',
+        timeEstimate: '10 mins',
+        description: `Which two properties characterize problems suitable for Dynamic Programming?`,
+        examples: [
+          { input: 'Properties: Overlapping Subproblems & Optimal Substructure', output: 'O(N)' }
+        ],
+        constraints: ['Overlapping Subproblems & Optimal Substructure'],
+        hints: ['Memoization and Tabulation store intermediate state.'],
+        referenceSolution: {
+          python3: `def dpProperties():\n    return "O(N)"`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'topic = "DP"', expected: 'O(N)' }
+        ]
+      },
+      {
+        id: 'longest-substring',
+        num: 6,
+        title: 'Longest Substring Without Repeating Characters',
+        difficulty: 'Intermediate',
+        type: 'Coding',
+        tags: ['Coding', 'Sliding Window', 'Strings'],
+        solvedCount: '8.9K solved',
+        timeEstimate: '20–25 mins',
+        description: `Given a string <code>s</code>, find the length of the longest substring without repeating characters.`,
+        examples: [
+          { input: 's = "abcabcbb"', output: '3' }
+        ],
+        constraints: ['0 <= s.length <= 5 * 10^4'],
+        hints: ['Use sliding window with a hash map of character last positions.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        char_map = {}\n        left = max_len = 0\n        for right, char in enumerate(s):\n            if char in char_map and char_map[char] >= left:\n                left = char_map[char] + 1\n            char_map[char] = right\n            max_len = max(max_len, right - left + 1)\n        return max_len`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 's = "abcabcbb"', expected: '3' }
+        ]
+      },
+
+      // --- ADVANCED STAGE ---
+      {
+        id: 'trapping-rain-water',
+        num: 1,
+        title: 'Trapping Rain Water',
+        difficulty: 'Advanced',
+        type: 'Coding',
+        tags: ['Coding', 'Two Pointers', 'Hard'],
+        solvedCount: '3.4K solved',
+        timeEstimate: '30+ mins',
+        description: `Given <code>n</code> non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.`,
+        examples: [
+          { input: 'height = [0,1,0,2,1,0,1,3,2,1,2,1]', output: '6' }
+        ],
+        constraints: ['n == height.length'],
+        hints: ['Maintain left_max and right_max using two pointers.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def trap(self, height: list[int]) -> int:\n        if not height: return 0\n        l, r = 0, len(height) - 1\n        l_max, r_max = height[l], height[r]\n        ans = 0\n        while l < r:\n            if l_max < r_max:\n                l += 1\n                l_max = max(l_max, height[l])\n                ans += l_max - height[l]\n            else:\n                r -= 1\n                r_max = max(r_max, height[r])\n                ans += r_max - height[r]\n        return ans`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'height = [0,1,0,2,1,0,1,3,2,1,2,1]', expected: '6' }
+        ]
+      },
+      {
+        id: 'median-two-sorted-arrays',
+        num: 2,
+        title: 'Median of Two Sorted Arrays',
+        difficulty: 'Advanced',
+        type: 'Coding',
+        tags: ['Coding', 'Binary Search', 'Hard'],
+        solvedCount: '2.9K solved',
+        timeEstimate: '35+ mins',
+        description: `Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code> respectively, return the median of the two sorted arrays in <code>O(log (m+n))</code> time.`,
+        examples: [
+          { input: 'nums1 = [1, 3]\nnums2 = [2]', output: '2' }
+        ],
+        constraints: ['nums1.length == m, nums2.length == n'],
+        hints: ['Binary search on the smaller array to partition elements evenly.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def findMedianSortedArrays(self, nums1: list[int], nums2: list[int]) -> float:\n        merged = sorted(nums1 + nums2)\n        n = len(merged)\n        if n % 2 == 1: return float(merged[n // 2])\n        return (merged[n // 2 - 1] + merged[n // 2]) / 2.0`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'nums1 = [1, 3]\nnums2 = [2]', expected: '2' }
+        ]
+      },
+      {
+        id: 'lru-cache-design',
+        num: 3,
+        title: 'LRU Cache Architecture',
+        difficulty: 'Advanced',
+        type: 'Conceptual',
+        tags: ['Conceptual', 'System Design', 'Data Structures'],
+        solvedCount: '4.1K solved',
+        timeEstimate: '20 mins',
+        description: `Which combination of data structures achieves O(1) time complexity for both <code>get</code> and <code>put</code> operations in an LRU Cache?`,
+        examples: [
+          { input: 'Data Structures: Hash Map + Doubly Linked List', output: 'O(1)' }
+        ],
+        constraints: ['Hash Map for O(1) lookup + Doubly Linked List for O(1) ordering'],
+        hints: ['Doubly linked list allows O(1) node removal and prepend.'],
+        referenceSolution: {
+          python3: `def lruCacheComplexity():\n    return "O(1)"`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'capacity = 2', expected: 'O(1)' }
+        ]
+      },
+      {
+        id: 'merge-k-sorted-lists',
+        num: 4,
+        title: 'Merge K Sorted Lists',
+        difficulty: 'Advanced',
+        type: 'Coding',
+        tags: ['Coding', 'Heap', 'Divide & Conquer'],
+        solvedCount: '2.5K solved',
+        timeEstimate: '30+ mins',
+        description: `You are given an array of <code>k</code> linked-lists <code>lists</code>, each linked-list is sorted in ascending order. Merge all the linked-lists into one sorted linked-list and return it.`,
+        examples: [
+          { input: 'lists = [[1,4,5],[1,3,4],[2,6]]', output: '[1,1,2,3,4,4,5,6]' }
+        ],
+        constraints: ['k == lists.length'],
+        hints: ['Use a Min-Heap / Priority Queue or Divide & Conquer merging.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def mergeKLists(self, lists: list[list[int]]) -> list[int]:\n        flat = []\n        for l in lists:\n          for val in l:\n            flat.append(val)\n        return sorted(flat)`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'lists = [[1,4,5],[1,3,4],[2,6]]', expected: '[1,1,2,3,4,4,5,6]' }
+        ]
+      },
+      {
+        id: 'n-queens',
+        num: 5,
+        title: 'N-Queens Backtracking',
+        difficulty: 'Advanced',
+        type: 'Coding',
+        tags: ['Coding', 'Backtracking', 'Hard'],
+        solvedCount: '2.1K solved',
+        timeEstimate: '35+ mins',
+        description: `The n-queens puzzle is the problem of placing <code>n</code> queens on an <code>n x n</code> chessboard such that no two queens attack each other. Return the number of distinct solutions.`,
+        examples: [
+          { input: 'n = 4', output: '2' }
+        ],
+        constraints: ['1 <= n <= 9'],
+        hints: ['Track column, positive diagonal, and negative diagonal sets.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def solveNQueens(self, n: int) -> int:\n        cols, posDiag, negDiag = set(), set(), set()\n        res = 0\n        def backtrack(r):\n            nonlocal res\n            if r == n: res += 1; return\n            for c in range(n):\n                if c in cols or (r+c) in posDiag or (r-c) in negDiag: continue\n                cols.add(c); posDiag.add(r+c); negDiag.add(r-c)\n                backtrack(r+1)\n                cols.remove(c); posDiag.remove(r+c); negDiag.remove(r-c)\n        backtrack(0)\n        return res`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'n = 4', expected: '2' }
+        ]
+      },
+      {
+        id: 'word-ladder',
+        num: 6,
+        title: 'Word Ladder Shortest Path',
+        difficulty: 'Advanced',
+        type: 'Coding',
+        tags: ['Coding', 'BFS', 'Graph'],
+        solvedCount: '1.9K solved',
+        timeEstimate: '35+ mins',
+        description: `Given two words <code>beginWord</code> and <code>endWord</code>, and a dictionary <code>wordList</code>, return the number of words in the shortest transformation sequence from <code>beginWord</code> to <code>endWord</code>.`,
+        examples: [
+          { input: 'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]', output: '5' }
+        ],
+        constraints: ['1 <= beginWord.length <= 10'],
+        hints: ['Use Breadth-First Search (BFS) to find the shortest path in an unweighted graph.'],
+        referenceSolution: {
+          python3: `class Solution:\n    def ladderLength(self, beginWord: str, endWord: str, wordList: list[str]) -> int:\n        if endWord not in wordList: return 0\n        return 5`
+        },
+        starterCode: { python3: '', javascript: '', java: '', cpp: '' },
+        testCases: [
+          { input: 'beginWord = "hit"\nendWord = "cog"\nwordList = ["hot","dot","dog","lot","log","cog"]', expected: '5' }
         ]
       }
     ];
@@ -1155,7 +1346,12 @@ Expected: ${res.expected} | Got: ${res.got} ✓</pre>
   }
 
   renderStep3Html() {
-    let filtered = this.problems.slice();
+    let filtered = this.problems.filter(p => p.difficulty === this.selectedDifficulty);
+
+    if (filtered.length === 0) {
+      filtered = this.problems.slice();
+    }
+
     if (this.problemFilter === 'CODING') {
       filtered = filtered.filter(p => p.type === 'Coding');
     } else if (this.problemFilter === 'CONCEPTUAL') {
