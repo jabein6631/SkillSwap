@@ -40,8 +40,8 @@ const sessionController = {
         rate
       } = req.body;
       const result = await supabaseService.bookSessionEscrow({
-        learnerId: learnerId || req.currentUserId || req.user?.id || 'sri',
-        tutorId: mentorId || tutorId,
+        learnerId: learnerId || req.body.learner_id || req.currentUserId || req.user?.id || 'sri',
+        tutorId: mentorId || tutorId || req.body.mentor_id || req.body.tutor_id || (req.body.mentor && (req.body.mentor.id || req.body.mentor.user_id || req.body.mentor.email)),
         skillName: skillName || subject,
         subject,
         topic: topic || title,

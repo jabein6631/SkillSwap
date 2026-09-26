@@ -1220,8 +1220,11 @@ const dbProvider = {
     }
 
     // 2. Fetch tutor and calculate rate
-    const tutorIdStr = String(tutorId || '').trim();
-    const tutor = await db.getAsync(
+    let tutorIdStr = typeof tutorId === 'object' && tutorId !== null
+      ? (tutorId.id || tutorId.user_id || tutorId.email || tutorId.name || '')
+      : String(tutorId || '').trim();
+
+    let tutor = await db.getAsync(
       `SELECT * FROM users WHERE id = ? OR LOWER(name) = ? OR LOWER(email) = ?`,
       [tutorIdStr, tutorIdStr.toLowerCase(), tutorIdStr.toLowerCase()]
     );
