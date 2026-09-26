@@ -19,6 +19,8 @@ router.get('/:id/live-meeting', sessionController.getOrCreateLiveMeeting);
 router.post('/:id/live-meeting', sessionController.getOrCreateLiveMeeting);
 router.post('/:id/end-meeting', sessionController.endLiveMeeting);
 router.get('/:id/status', sessionController.checkSessionStatus);
+router.post('/:id/signal', sessionController.sendSignal);
+router.get('/:id/signals', sessionController.getSignals);
 
 // Multi-Student Group Cohort & Live Masterclass Routes
 router.post('/create-cohort', sessionController.createCohort);

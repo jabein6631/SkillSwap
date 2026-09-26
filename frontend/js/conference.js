@@ -92,6 +92,9 @@ class SkillSwapConference {
     // 3. Connect to Cross-Tab BroadcastChannel Signaling
     this.initBroadcastSignaling();
 
+    // 4. Start HTTP Signaling Polling for Vercel Serverless
+    this.startSignalingPolling();
+
     this.isInCall = true;
     this.setupCodeEditorPermissions();
     this.initVoiceActivityDetection();
@@ -322,18 +325,64 @@ class SkillSwapConference {
   }
 
   /**
-   * Send a signaling message through WebSocket
+   * Send a signaling message through WebSocket, BroadcastChannel & HTTP Fallback
    */
   sendSignalingMessage(msg) {
     const payload = {
       ...msg,
       roomId: this.roomId,
-      peerId: this.peerId
+      peerId: this.peerId,
+      senderPeerId: this.peerId,
+      userProfile: this.currentUserProfile
     };
 
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(payload));
     }
+
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage(payload);
+      } catch (e) {}
+    }
+
+    // HTTP Signaling Fallback for Vercel Serverless Functions
+    if (this.sessionId) {
+      const headers = window.store?.getAuthHeaders ? window.store.getAuthHeaders() : { 'Content-Type': 'application/json' };
+      fetch(`/api/sessions/${this.sessionId}/signal`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload)
+      }).catch(e => console.warn('HTTP Signal POST error:', e));
+    }
+  }
+
+  startSignalingPolling() {
+    if (this.signalingInterval) clearInterval(this.signalingInterval);
+    this.lastSignalTime = Date.now() - 5000;
+
+    this.signalingInterval = setInterval(async () => {
+      if (!this.isInCall || !this.sessionId) {
+        clearInterval(this.signalingInterval);
+        this.signalingInterval = null;
+        return;
+      }
+      try {
+        const headers = window.store?.getAuthHeaders ? window.store.getAuthHeaders() : { 'Content-Type': 'application/json' };
+        const res = await fetch(`/api/sessions/${this.sessionId}/signals?peerId=${encodeURIComponent(this.peerId)}&since=${this.lastSignalTime}`, { headers });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.signals) && data.signals.length > 0) {
+          for (const sig of data.signals) {
+            if (sig.timestamp && sig.timestamp > this.lastSignalTime) {
+              this.lastSignalTime = sig.timestamp;
+            }
+            await this.handleSignalingMessage(sig);
+          }
+        }
+      } catch (e) {
+        console.warn('HTTP Signaling Polling error:', e);
+      }
+    }, 1000);
   }
 
   /**
@@ -988,6 +1037,11 @@ class SkillSwapConference {
     if (this.vadInterval) {
       clearInterval(this.vadInterval);
       this.vadInterval = null;
+    }
+
+    if (this.signalingInterval) {
+      clearInterval(this.signalingInterval);
+      this.signalingInterval = null;
     }
 
     if (this.milestoneInterval) {

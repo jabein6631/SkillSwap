@@ -3034,6 +3034,35 @@ const dbProvider = {
    * Determine whether a session has passed its scheduled end time
    * Server Source of Truth logic
    */
+  signalStore: new Map(),
+
+  async addSignal(sessionId, signalData) {
+    if (!this.signalStore.has(sessionId)) {
+      this.signalStore.set(sessionId, []);
+    }
+    const queue = this.signalStore.get(sessionId);
+    const item = {
+      timestamp: Date.now(),
+      signal: signalData
+    };
+    queue.push(item);
+    if (queue.length > 200) {
+      queue.shift();
+    }
+    return { success: true };
+  },
+
+  async getSignals(sessionId, peerId, sinceMs = 0) {
+    const queue = this.signalStore.get(sessionId) || [];
+    const filtered = queue
+      .filter(item => item.timestamp > Number(sinceMs || 0))
+      .map(item => ({ ...item.signal, timestamp: item.timestamp }))
+      .filter(sig => !sig.peerId || sig.peerId !== peerId)
+      .filter(sig => !sig.targetPeerId || sig.targetPeerId === peerId);
+
+    return filtered;
+  },
+
   isSessionExpired(session) {
     if (!session) return false;
     const st = (session.status || '').toUpperCase();
@@ -3057,62 +3086,13 @@ const dbProvider = {
         if (now >= scheduledEnd) {
           return true;
         }
+        return false;
       }
     }
 
-    // 2. Calculate scheduled end time from session.date and session.time
-    if (session.date && session.time) {
-      try {
-        let dateStr = String(session.date).trim();
-        const nowObj = new Date();
-        const todayIso = nowObj.toISOString().split('T')[0];
-        if (dateStr.toLowerCase() === 'today') {
-          dateStr = todayIso;
-        } else if (dateStr.toLowerCase() === 'tomorrow') {
-          const d = new Date();
-          d.setDate(d.getDate() + 1);
-          dateStr = d.toISOString().split('T')[0];
-        }
-
-        let timeStr = String(session.time).trim();
-        let h = 0;
-        let m = 0;
-
-        const isPm = /pm/i.test(timeStr);
-        const isAm = /am/i.test(timeStr);
-        const cleanedTime = timeStr.replace(/(am|pm)/i, '').trim();
-        const parts = cleanedTime.split(':');
-        if (parts.length >= 2) {
-          h = parseInt(parts[0], 10) || 0;
-          m = parseInt(parts[1], 10) || 0;
-          if (isPm && h < 12) h += 12;
-          if (isAm && h === 12) h = 0;
-        } else if (parts.length === 1) {
-          h = parseInt(parts[0], 10) || 0;
-          if (isPm && h < 12) h += 12;
-          if (isAm && h === 12) h = 0;
-        }
-
-        let scheduledStart;
-        if (dateStr.includes('-')) {
-          const dParts = dateStr.split('-');
-          if (dParts.length === 3) {
-            scheduledStart = new Date(parseInt(dParts[0], 10), parseInt(dParts[1], 10) - 1, parseInt(dParts[2], 10), h, m, 0);
-          }
-        }
-        if (!scheduledStart || isNaN(scheduledStart.getTime())) {
-          scheduledStart = new Date(`${dateStr}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`);
-        }
-
-        if (scheduledStart && !isNaN(scheduledStart.getTime())) {
-          const scheduledEnd = scheduledStart.getTime() + durationMs;
-          if (now >= scheduledEnd) {
-            return true;
-          }
-        }
-      } catch (e) {
-        console.warn('isSessionExpired calculation notice:', e.message);
-      }
+    // 2. If session is LIVE or CONFIRMED and hasn't started yet, keep it open
+    if (st === 'LIVE' || st === 'CONFIRMED' || st === 'OPEN') {
+      return false;
     }
 
     return false;

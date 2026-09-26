@@ -385,27 +385,23 @@ const sessionController = {
       }
 
       // Record live attendance for participants entering the room
+      if (isTeacher) {
+        await db.runAsync(
+          `UPDATE sessions SET teacher_joined_at = COALESCE(teacher_joined_at, CURRENT_TIMESTAMP), meeting_started_at = COALESCE(meeting_started_at, CURRENT_TIMESTAMP), status = 'LIVE' WHERE id = ?`,
+          [id]
+        );
+      }
+      if (isStudent || isEnrolled) {
+        await db.runAsync(
+          `UPDATE sessions SET student_joined_at = COALESCE(student_joined_at, CURRENT_TIMESTAMP) WHERE id = ?`,
+          [id]
+        );
+      }
+
       if (isCohort && (isTeacher || isEnrolled)) {
         try {
           await supabaseService.recordLiveAttendance({ sessionId: id, userId: currentUserId });
         } catch (e) {}
-      } else if (!isCohort) {
-        // Record joins for 1-on-1 Swaps
-        if (isTeacher) {
-          await db.runAsync(`UPDATE sessions SET teacher_joined_at = COALESCE(teacher_joined_at, CURRENT_TIMESTAMP) WHERE id = ?`, [id]);
-        }
-        if (isStudent) {
-          await db.runAsync(`UPDATE sessions SET student_joined_at = COALESCE(student_joined_at, CURRENT_TIMESTAMP) WHERE id = ?`, [id]);
-        }
-
-        // When BOTH User A and User B have joined, start live meeting timer and mark status 'LIVE'
-        const updatedJoinStatus = await db.getAsync(`SELECT student_joined_at, teacher_joined_at, meeting_started_at FROM sessions WHERE id = ?`, [id]);
-        if (updatedJoinStatus && updatedJoinStatus.student_joined_at && updatedJoinStatus.teacher_joined_at && !updatedJoinStatus.meeting_started_at) {
-          await db.runAsync(
-            `UPDATE sessions SET meeting_started_at = CURRENT_TIMESTAMP, status = 'LIVE' WHERE id = ? AND meeting_started_at IS NULL`,
-            [id]
-          );
-        }
       }
 
       // 3. Atomically Retrieve or Create Meeting (PREVENTS DUPLICATE MEETINGS)
@@ -916,6 +912,28 @@ const sessionController = {
         status: remainingSeconds <= 0 ? 'ENDED' : session.status,
         remainingSeconds
       });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async sendSignal(req, res, next) {
+    try {
+      const { id } = req.params;
+      const signalData = req.body;
+      const result = await supabaseService.addSignal(id, signalData);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getSignals(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { peerId, since } = req.query;
+      const signals = await supabaseService.getSignals(id, peerId, Number(since || 0));
+      res.json({ success: true, signals });
     } catch (err) {
       next(err);
     }
