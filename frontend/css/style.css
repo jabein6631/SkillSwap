@@ -1680,27 +1680,27 @@ video.room-video-feed.screenshare-active {
 }
 
 .video-grid-mock.screenshare-mode #liveRoomAttendeesGrid .student-tile {
-  width: 130px !important;
-  height: 85px !important;
+  width: 250px !important;
+  height: 155px !important;
   flex-shrink: 0 !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
   overflow: hidden !important;
-  border: 1.5px solid var(--primary, #38bdf8) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid var(--primary, #38bdf8) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5) !important;
 }
 
 .video-grid-mock.screenshare-mode #liveRoomAttendeesGrid .student-tile .video-live-badge {
-  font-size: 0.6rem !important;
-  padding: 0.1rem 0.35rem !important;
-  top: 4px !important;
-  left: 4px !important;
+  font-size: 0.72rem !important;
+  padding: 0.2rem 0.5rem !important;
+  top: 6px !important;
+  left: 6px !important;
 }
 
 .video-grid-mock.screenshare-mode #liveRoomAttendeesGrid .student-tile .video-name-tag {
-  font-size: 0.65rem !important;
-  padding: 0.15rem 0.4rem !important;
-  bottom: 4px !important;
-  left: 4px !important;
+  font-size: 0.72rem !important;
+  padding: 0.25rem 0.5rem !important;
+  bottom: 6px !important;
+  left: 6px !important;
 }
 
 .video-live-badge {
