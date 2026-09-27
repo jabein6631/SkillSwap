@@ -25,6 +25,7 @@ try {
 try {
   const apiRoutes = require('../backend/routes');
   app.use('/api', apiRoutes);
+  app.use('/', apiRoutes);
 } catch (err) {
   console.error('💥 API routes load error:', err);
 }
@@ -39,11 +40,10 @@ app.use('/js', express.static(path.join(frontendPath, 'js')));
 app.use('/assets', express.static(path.join(frontendPath, 'assets')));
 app.use(express.static(frontendPath));
 
-app.all('/api/*', (req, res) => {
-  return res.status(404).json({ success: false, error: 'API route not found: ' + req.originalUrl });
-});
-
 app.get('*', (req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(404).json({ success: false, error: 'API route not found: ' + req.originalUrl });
+  }
   const indexPath = path.join(frontendPath, 'index.html');
   res.sendFile(indexPath);
 });

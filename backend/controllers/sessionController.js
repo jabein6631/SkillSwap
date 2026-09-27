@@ -938,6 +938,7 @@ const sessionController = {
     } catch (err) {
       next(err);
     }
+  },
   async endLiveMeeting(req, res, next) {
     try {
       const { id } = req.params;
