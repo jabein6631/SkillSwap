@@ -8582,7 +8582,6 @@
 
       this.activeLiveRoomSessionId = sessionId;
       this.switchView('view-room');
-      await this.renderLiveRoom(sessionId);
     },
 
     async enrollInLiveCohort(sessionId) {

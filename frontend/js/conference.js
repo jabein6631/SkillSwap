@@ -57,7 +57,8 @@ class SkillSwapConference {
    */
   async startMeeting(sessionId, sessionData, meetingData) {
     if (this.isInCall) {
-      this.leaveMeeting();
+      this.cleanupConnections();
+      this.isInCall = false;
     }
 
     this.sessionId = sessionId;

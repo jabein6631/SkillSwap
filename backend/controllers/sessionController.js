@@ -374,6 +374,17 @@ const sessionController = {
           [id, currentUserId]
         );
         isEnrolled = !!attendeeRecord;
+        if (!isEnrolled && !isTeacher) {
+          try {
+            await db.runAsync(
+              `INSERT OR IGNORE INTO session_attendees (session_id, student_id, joined_at) VALUES (?, ?, CURRENT_TIMESTAMP)`,
+              [id, currentUserId]
+            );
+            isEnrolled = true;
+          } catch (e) {
+            console.warn('Auto-enroll error on joining meeting:', e.message);
+          }
+        }
       }
 
       // Deny unauthorized third-party users
