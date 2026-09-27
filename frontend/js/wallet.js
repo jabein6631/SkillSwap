@@ -35,6 +35,26 @@ class SkillSwapStore {
     return headers;
   }
 
+  async safeJson(res) {
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      try {
+        return await res.json();
+      } catch (e) {
+        throw new Error('Invalid JSON format received from server.');
+      }
+    }
+    const text = await res.text();
+    if (!res.ok) {
+      throw new Error(`Server connection error (${res.status}): ${res.statusText || 'Endpoint returned HTML instead of JSON'}`);
+    }
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      throw new Error('Server returned HTML/text instead of valid JSON.');
+    }
+  }
+
   async init() {
     try {
       // Clear legacy localStorage auth keys so new tabs start at Login page
@@ -82,8 +102,8 @@ class SkillSwapStore {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name, college, major, role, bio })
     });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Registration failed');
+    const data = await this.safeJson(res);
+    if (!res.ok || !data.success) throw new Error(data.error || data.message || 'Registration failed');
 
     this.setToken(data.token);
     this.currentUser = data.user;
@@ -109,8 +129,8 @@ class SkillSwapStore {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Login failed');
+    const data = await this.safeJson(res);
+    if (!res.ok || !data.success) throw new Error(data.error || data.message || 'Login failed. Please check your credentials.');
 
     this.setToken(data.token);
     this.currentUser = data.user;
@@ -135,8 +155,8 @@ class SkillSwapStore {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password: 'Password123', userId: personaId })
       });
-      const data = await res.json();
-      if (data.success && data.token) {
+      const data = await this.safeJson(res);
+      if (res.ok && data.success && data.token) {
         this.setToken(data.token);
         this.currentUser = data.user;
         this.currentPersonaId = data.user.id;
