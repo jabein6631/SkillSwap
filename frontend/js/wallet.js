@@ -1090,7 +1090,7 @@ class SkillSwapStore {
       upcoming: (this.sessions || []).filter(s => s.status !== 'Completed' && s.status !== 'Cancelled'),
       past: (this.sessions || []).filter(s => s.status === 'Completed'),
       masterclasses: (this.sessions || []).filter(s => s.session_type === 'GROUP_COHORT'),
-      groups: (this.sessions || []).filter(s => s.session_type === 'GROUP_COHORT'),
+      groups: (this.sessions || []).filter(s => s.session_type === 'GROUP_COHORT' && s.status !== 'Completed' && s.status !== 'COMPLETED' && s.status !== 'Ended' && s.status !== 'ENDED' && s.status !== 'Cancelled' && s.status !== 'CANCELLED'),
       cancelled: (this.sessions || []).filter(s => s.status === 'Cancelled'),
       counts: { upcoming: 0, past: 0, masterclasses: 0, groups: 0, cancelled: 0 }
     };

@@ -2493,7 +2493,7 @@ const dbProvider = {
     const upcoming = userRelevant.filter(s => {
       if (!s.status) return false;
       const st = s.status.toUpperCase();
-      if (st === 'PENDING' || st === 'CANCELLED' || st === 'DECLINED' || st === 'COMPLETED' || st === 'ENDED') return false;
+      if (st === 'PENDING' || st === 'CANCELLED' || st === 'DECLINED' || st === 'COMPLETED' || st === 'ENDED' || st === 'ATTENDANCE_FINALIZED') return false;
       return !s.isPastEnd && (st === 'ACCEPTED' || st === 'CONFIRMED' || st === 'OPEN' || st === 'UPCOMING' || st === 'LIVE');
     });
 
@@ -2503,7 +2503,11 @@ const dbProvider = {
       return st === 'completed' || st === 'ended' || st === 'attendance_finalized' || s.isPastEnd;
     });
     const masterclasses = enriched.filter(s => isUserMatch(s.teacher_id) && s.session_type === 'GROUP_COHORT');
-    const groups = enriched.filter(s => s.session_type === 'GROUP_COHORT' && s.status && s.status.toLowerCase() !== 'cancelled');
+    const groups = enriched.filter(s => {
+      if (s.session_type !== 'GROUP_COHORT' || !s.status) return false;
+      const st = s.status.toUpperCase();
+      return st !== 'CANCELLED' && st !== 'DECLINED' && st !== 'COMPLETED' && st !== 'ENDED' && st !== 'ATTENDANCE_FINALIZED' && !s.isPastEnd;
+    });
     const cancelled = userRelevant.filter(s => s.status && (s.status.toLowerCase() === 'cancelled' || s.status.toUpperCase() === 'CANCELLED' || s.status.toUpperCase() === 'DECLINED'));
 
     const pendingReqs = requests.filter(r => (r.status || '').toUpperCase() === 'PENDING').length;

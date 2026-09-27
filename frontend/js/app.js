@@ -12061,15 +12061,9 @@
       }
 
       if (this.timerSeconds <= 0) {
-        if (session && (session.status === 'LIVE' || session.status === 'IN_PROGRESS' || session.session_type === 'GROUP_COHORT')) {
-          this.timerSeconds = Math.round((Number(session.hours) || 1) * 3600);
-        } else {
-          if (display) display.textContent = '00:00:00 SESSION ENDED';
-          if (window.skillSwapConference && window.skillSwapConference.handleRemoteSessionEnded) {
-            window.skillSwapConference.handleRemoteSessionEnded('The scheduled session time has expired.');
-          }
-          return;
-        }
+        if (display) display.textContent = '00:00:00 SESSION ENDED';
+        this.handleTimerExpired(session);
+        return;
       }
 
       const updateDisplay = () => {
@@ -12090,11 +12084,42 @@
           clearInterval(this.timerInterval);
           this.timerInterval = null;
           if (display) display.textContent = '00:00:00 SESSION ENDED';
-          if (window.skillSwapConference && window.skillSwapConference.handleRemoteSessionEnded) {
-            window.skillSwapConference.handleRemoteSessionEnded('The scheduled session time has expired.');
-          }
+          this.handleTimerExpired(session);
         }
       }, 1000);
+    },
+
+    async handleTimerExpired(session) {
+      const display = document.getElementById('sessionTimerDisplay');
+      if (display) display.textContent = '00:00:00 SESSION ENDED';
+
+      if (window.skillSwapConference && window.skillSwapConference.handleRemoteSessionEnded) {
+        window.skillSwapConference.handleRemoteSessionEnded('The scheduled session time has expired.');
+      }
+
+      if (session && session.id) {
+        try {
+          if (session.session_type === 'GROUP_COHORT') {
+            await fetch(`/api/sessions/${session.id}/complete-cohort`, {
+              method: 'POST',
+              headers: window.store?.getAuthHeaders() || {}
+            });
+          } else if (window.store?.completeSessionAndReleaseEscrow) {
+            await window.store.completeSessionAndReleaseEscrow(session.id, 5, 'Session completed when time expired', ['Punctual', 'Helpful']);
+          }
+        } catch (e) {
+          console.warn('Auto completion on timer expiry note:', e.message);
+        }
+      }
+
+      try {
+        if (window.store?.fetchSessions) {
+          await window.store.fetchSessions();
+        }
+        if (this.renderSessionsView) {
+          this.renderSessionsView();
+        }
+      } catch (e) {}
     },
 
     stopSessionTimer() {

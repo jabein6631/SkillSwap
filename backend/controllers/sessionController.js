@@ -917,16 +917,22 @@ const sessionController = {
       let remainingMs = Math.max(0, scheduledEndMs - Date.now());
       let remainingSeconds = Math.floor(remainingMs / 1000);
 
-      // If status is LIVE or IN_PROGRESS, treat as active for attendees
-      const isActiveSession = session.status === 'LIVE' || session.status === 'IN_PROGRESS';
-      if (isActiveSession && remainingSeconds <= 0) {
-        remainingSeconds = Math.floor(durationMs / 1000);
+      if (remainingSeconds <= 0 && session.status !== 'Completed' && session.status !== 'ENDED') {
+        try {
+          await db.runAsync(`UPDATE sessions SET status = 'Completed', meeting_ended_at = COALESCE(meeting_ended_at, CURRENT_TIMESTAMP) WHERE id = ?`, [id]);
+        } catch (e) {}
+        return res.json({
+          success: true,
+          isEnded: true,
+          status: 'Completed',
+          remainingSeconds: 0
+        });
       }
 
       res.json({
         success: true,
-        isEnded: isActiveSession ? false : remainingSeconds <= 0,
-        status: (remainingSeconds <= 0 && !isActiveSession) ? 'ENDED' : session.status,
+        isEnded: remainingSeconds <= 0,
+        status: remainingSeconds <= 0 ? 'Completed' : session.status,
         remainingSeconds
       });
     } catch (err) {
