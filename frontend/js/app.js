@@ -12046,46 +12046,48 @@
         return;
       }
 
+      let startedMs = Date.now();
+      let totalDurationSecs = 1800;
+
       if (session) {
-        const totalDurationSecs = Math.round((Number(session.hours) || 1) * 3600);
+        totalDurationSecs = Math.round((Number(session.hours) || 1) * 3600);
         if (session.meeting_started_at) {
           const rawDateStr = String(session.meeting_started_at).trim();
-          const isoUtcStr = rawDateStr.includes('T') ? (rawDateStr.endsWith('Z') ? rawDateStr : rawDateStr + 'Z') : (rawDateStr.replace(' ', 'T') + 'Z');
-          const startedMs = new Date(isoUtcStr).getTime() || Date.now();
-          const nowMs = Date.now();
-          const elapsedSecs = Math.max(0, Math.floor((nowMs - startedMs) / 1000));
-          this.timerSeconds = Math.max(0, totalDurationSecs - elapsedSecs);
-        } else {
-          this.timerSeconds = totalDurationSecs;
+          const isoUtcStr = rawDateStr.includes('T') ? (rawDateStr.endsWith('Z') || rawDateStr.includes('+') ? rawDateStr : rawDateStr + 'Z') : (rawDateStr.replace(' ', 'T') + 'Z');
+          const parsedMs = new Date(isoUtcStr).getTime();
+          if (!isNaN(parsedMs)) {
+            startedMs = parsedMs;
+          }
         }
-      }
-
-      if (this.timerSeconds <= 0) {
-        if (display) display.textContent = '00:00:00 SESSION ENDED';
-        this.handleTimerExpired(session);
-        return;
       }
 
       const updateDisplay = () => {
         if (!display) return;
-        const hrs = String(Math.floor(this.timerSeconds / 3600)).padStart(2, '0');
-        const mins = String(Math.floor((this.timerSeconds % 3600) / 60)).padStart(2, '0');
-        const secs = String(this.timerSeconds % 60).padStart(2, '0');
+        const nowMs = Date.now();
+        const elapsedSecs = Math.max(0, Math.floor((nowMs - startedMs) / 1000));
+        const remainingSecs = Math.max(0, totalDurationSecs - elapsedSecs);
+        this.timerSeconds = remainingSecs;
+
+        if (remainingSecs <= 0) {
+          if (display) display.textContent = '00:00:00 SESSION ENDED';
+          if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+          }
+          this.handleTimerExpired(session);
+          return;
+        }
+
+        const hrs = String(Math.floor(remainingSecs / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((remainingSecs % 3600) / 60)).padStart(2, '0');
+        const secs = String(remainingSecs % 60).padStart(2, '0');
         display.textContent = `${hrs}:${mins}:${secs} REMAINING`;
       };
 
       updateDisplay();
 
       this.timerInterval = setInterval(() => {
-        if (this.timerSeconds > 0) {
-          this.timerSeconds--;
-          updateDisplay();
-        } else {
-          clearInterval(this.timerInterval);
-          this.timerInterval = null;
-          if (display) display.textContent = '00:00:00 SESSION ENDED';
-          this.handleTimerExpired(session);
-        }
+        updateDisplay();
       }, 1000);
     },
 

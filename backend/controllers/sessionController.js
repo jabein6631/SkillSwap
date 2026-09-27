@@ -398,13 +398,13 @@ const sessionController = {
       // Record live attendance for participants entering the room
       if (isTeacher) {
         await db.runAsync(
-          `UPDATE sessions SET teacher_joined_at = COALESCE(teacher_joined_at, CURRENT_TIMESTAMP), meeting_started_at = CURRENT_TIMESTAMP, status = 'LIVE' WHERE id = ?`,
+          `UPDATE sessions SET teacher_joined_at = COALESCE(teacher_joined_at, CURRENT_TIMESTAMP), meeting_started_at = COALESCE(meeting_started_at, CURRENT_TIMESTAMP), status = 'LIVE' WHERE id = ?`,
           [id]
         );
       }
       if (isStudent || isEnrolled) {
         await db.runAsync(
-          `UPDATE sessions SET student_joined_at = COALESCE(student_joined_at, CURRENT_TIMESTAMP) WHERE id = ?`,
+          `UPDATE sessions SET student_joined_at = COALESCE(student_joined_at, CURRENT_TIMESTAMP), meeting_started_at = COALESCE(meeting_started_at, CURRENT_TIMESTAMP) WHERE id = ?`,
           [id]
         );
       }
@@ -935,6 +935,35 @@ const sessionController = {
         status: remainingSeconds <= 0 ? 'Completed' : session.status,
         remainingSeconds
       });
+    } catch (err) {
+      next(err);
+    }
+  async endLiveMeeting(req, res, next) {
+    try {
+      const { id } = req.params;
+      const currentUserId = req.user?.id || req.currentUserId;
+
+      const session = await db.getAsync(`SELECT * FROM sessions WHERE id = ?`, [id]);
+      if (!session) {
+        return res.status(404).json({ success: false, error: 'Session not found' });
+      }
+
+      await db.runAsync(
+        `UPDATE sessions SET status = 'Completed', meeting_ended_at = COALESCE(meeting_ended_at, CURRENT_TIMESTAMP) WHERE id = ?`,
+        [id]
+      );
+
+      if (session.session_type === 'GROUP_COHORT') {
+        try {
+          await supabaseService.finalizeMasterclassAttendance({ sessionId: id, tutorId: session.teacher_id || currentUserId });
+        } catch (e) {}
+      } else {
+        try {
+          await supabaseService.completeSessionAndReleaseEscrow({ sessionId: id, userId: currentUserId });
+        } catch (e) {}
+      }
+
+      res.json({ success: true, message: 'Session ended successfully', status: 'Completed' });
     } catch (err) {
       next(err);
     }
