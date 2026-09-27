@@ -525,6 +525,22 @@ class SkillSwapConference {
         this.appendInMeetingChatMessage(senderName || 'Peer', text);
         break;
       }
+
+      case 'screenshare-started': {
+        const videoGrid = document.getElementById('liveRoomVideoGrid');
+        if (videoGrid) videoGrid.classList.add('screenshare-mode');
+        const instructorVid = document.getElementById('liveRoomInstructorVideo');
+        if (instructorVid) instructorVid.classList.add('screenshare-active');
+        break;
+      }
+
+      case 'screenshare-stopped': {
+        const videoGrid = document.getElementById('liveRoomVideoGrid');
+        if (videoGrid) videoGrid.classList.remove('screenshare-mode');
+        const instructorVid = document.getElementById('liveRoomInstructorVideo');
+        if (instructorVid) instructorVid.classList.remove('screenshare-active');
+        break;
+      }
     }
   }
 
@@ -840,7 +856,15 @@ class SkillSwapConference {
         const localVideo = isHost
           ? document.getElementById('liveRoomInstructorVideo')
           : document.getElementById('peerVideo_self');
-        if (localVideo) localVideo.srcObject = this.screenStream;
+        if (localVideo) {
+          localVideo.srcObject = this.screenStream;
+          localVideo.classList.add('screenshare-active');
+        }
+
+        const videoGrid = document.getElementById('liveRoomVideoGrid');
+        if (videoGrid) videoGrid.classList.add('screenshare-mode');
+
+        this.sendSignalingMessage({ type: 'screenshare-started' });
 
         screenTrack.onended = () => {
           this.stopScreenShare();
@@ -877,8 +901,19 @@ class SkillSwapConference {
       const localVideo = isHost
         ? document.getElementById('liveRoomInstructorVideo')
         : document.getElementById('peerVideo_self');
-      if (localVideo) localVideo.srcObject = this.localStream;
+      if (localVideo) {
+        localVideo.srcObject = this.localStream;
+        localVideo.classList.remove('screenshare-active');
+      }
     }
+
+    const videoGrid = document.getElementById('liveRoomVideoGrid');
+    if (videoGrid) videoGrid.classList.remove('screenshare-mode');
+
+    const instructorVid = document.getElementById('liveRoomInstructorVideo');
+    if (instructorVid) instructorVid.classList.remove('screenshare-active');
+
+    this.sendSignalingMessage({ type: 'screenshare-stopped' });
 
     this.isScreenSharing = false;
     this.updateMediaButtonsUI();

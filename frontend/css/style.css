@@ -1640,6 +1640,69 @@ img {
   transform: scaleX(-1);
 }
 
+.instructor-podium .room-video-feed.screenshare-active,
+video.screenshare-active,
+video.room-video-feed.screenshare-active {
+  transform: scaleX(1) !important;
+  object-fit: contain !important;
+  background: #090d16 !important;
+}
+
+/* Screen Share Floating Picture-in-Picture Student Video Grid */
+.video-grid-mock.screenshare-mode {
+  position: relative !important;
+  min-height: 480px !important;
+}
+
+.video-grid-mock.screenshare-mode .instructor-podium {
+  width: 100% !important;
+  min-height: 480px !important;
+  height: 100% !important;
+  border-color: #38bdf8 !important;
+}
+
+.video-grid-mock.screenshare-mode #liveRoomAttendeesGrid {
+  position: absolute !important;
+  bottom: 16px !important;
+  right: 16px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 10px !important;
+  z-index: 20 !important;
+  max-width: 60% !important;
+  overflow-x: auto !important;
+  background: rgba(15, 23, 42, 0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  padding: 8px 10px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+}
+
+.video-grid-mock.screenshare-mode #liveRoomAttendeesGrid .student-tile {
+  width: 130px !important;
+  height: 85px !important;
+  flex-shrink: 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  border: 1.5px solid var(--primary, #38bdf8) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.video-grid-mock.screenshare-mode #liveRoomAttendeesGrid .student-tile .video-live-badge {
+  font-size: 0.6rem !important;
+  padding: 0.1rem 0.35rem !important;
+  top: 4px !important;
+  left: 4px !important;
+}
+
+.video-grid-mock.screenshare-mode #liveRoomAttendeesGrid .student-tile .video-name-tag {
+  font-size: 0.65rem !important;
+  padding: 0.15rem 0.4rem !important;
+  bottom: 4px !important;
+  left: 4px !important;
+}
+
 .video-live-badge {
   position: absolute;
   top: 10px;
